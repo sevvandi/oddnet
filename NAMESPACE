@@ -3,3 +3,5 @@
 export(anomalous_networks)
 export(compute_features_4)
 importFrom(dplyr,'%>%')
+importFrom(stats,"median,")
+importFrom(stats,quantile)

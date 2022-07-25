@@ -46,11 +46,6 @@ anomalous_networks <- function(networks,
                                vert_attr = FALSE,
                                attr_name = NULL,
                                attr_mat = NULL){
-  # networks is a list of adjacency matrices
-  # alpha is the parameter for lookout
-  # dd is the dimension for robust pca projection
-  # trim is to compute the trimmed mean and std dev
-  # vert_attr is null if there are no vertex attributes, if they are there, vert attr has the name of the attribute
 
   num_networks <- length(networks)
   features <- matrix(0, nrow = num_networks, ncol = 17)

@@ -2,10 +2,28 @@
 % Please edit documentation in R/features.R
 \name{compute_features_4}
 \alias{compute_features_4}
-\title{Computes features for each network}
+\title{Computes features for each network.}
 \usage{
 compute_features_4(gr, attributes = FALSE, attr_name = NULL)
 }
+\arguments{
+\item{gr}{The network or graph as an \code{igraph} object.}
+
+\item{attributes}{If the network nodes/vertices have attributes, then \code{attributes = TRUE}.}
+
+\item{attr_name}{The name of the node/vertex attribute. Only a single attribute can
+be specified.}
+}
+\value{
+A network features object.
+}
 \description{
-Computes features for each network
+This function computes features for each network using graph theoretic constructs.
+}
+\examples{
+set.seed(1)
+gr <- igraph::erdos.renyi.game(100, 0.05)
+compute_features_4(gr)
+
+
 }

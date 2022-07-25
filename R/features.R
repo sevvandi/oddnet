@@ -1,4 +1,21 @@
-#' Computes features for each network
+#' Computes features for each network.
+#'
+#' This function computes features for each network using graph theoretic constructs.
+#'
+#' @param gr The network or graph as an \code{igraph} object.
+#' @param attributes If the network nodes/vertices have attributes, then \code{attributes = TRUE}.
+#' @param attr_name The name of the node/vertex attribute. Only a single attribute can
+#' be specified.
+#'
+#' @return A network features object.
+#'
+#' @examples
+#' set.seed(1)
+#' gr <- igraph::erdos.renyi.game(100, 0.05)
+#' compute_features_4(gr)
+#'
+#'
+#' @importFrom stats median, quantile
 #' @export compute_features_4
 compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
   # gr is an igraph object
