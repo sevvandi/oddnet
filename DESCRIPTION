@@ -18,10 +18,13 @@ Imports:
     dplyr,
     fable,
     fabletools,
+    feasts,
     igraph,
     lookout,
     pcaPP,
     rlang,
     tibble,
     tidyr,
-    tsibble
+    tsibble,
+    urca,
+    utils

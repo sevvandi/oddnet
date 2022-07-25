@@ -38,6 +38,7 @@
 #'
 #' @importFrom dplyr '%>%'
 #' @importFrom rlang .data
+#'
 #' @export anomalous_networks
 anomalous_networks <- function(networks,
                                alpha = 0.05,
@@ -47,6 +48,7 @@ anomalous_networks <- function(networks,
                                vert_attr = FALSE,
                                attr_name = NULL,
                                attr_mat = NULL){
+
 
   num_networks <- length(networks)
   features <- matrix(0, nrow = num_networks, ncol = 17)

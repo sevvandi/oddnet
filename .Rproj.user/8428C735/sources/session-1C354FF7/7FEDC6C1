@@ -3,7 +3,7 @@
     "path": "~/repos/oddnet/README.Rmd",
     "project_path": "README.Rmd",
     "type": "r_markdown",
-    "hash": "918292688",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1658726779410.0,
@@ -12,8 +12,8 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "46,14",
-        "scrollLine": "20"
+        "cursorPosition": "48,26",
+        "scrollLine": "22"
     },
     "folds": "",
     "lastKnownWriteTime": 1658729790,

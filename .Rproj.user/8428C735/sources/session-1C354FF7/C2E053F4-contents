@@ -1,0 +1,3 @@
+#' @docType package
+#' @aliases NULL oddnet-package
+utils::globalVariables("value")
