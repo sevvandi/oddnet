@@ -1,6 +1,6 @@
 #' Computes features for each network
 #' @export compute_features_4
-compute_features_4 <- function(gr, color = FALSE, attr = NULL){
+compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
   # gr is an igraph object
   # triangles, degree and edges
 
@@ -16,13 +16,13 @@ compute_features_4 <- function(gr, color = FALSE, attr = NULL){
   clust_coeff <- igraph::transitivity(gr)
 
   # assortativity
-  if(color){
+  if(attributes){
     vert_attr <- names(igraph::vertex_attr(gr))
     if(length(vert_attr) > 1){
-      if(is.null(attr)){
-        stop("Too many vertex attributes. Specify attribute using parameter attr for feature computations.")
+      if(is.null(attr_name)){
+        stop("Too many vertex attributes. Specify a single attribute using parameter attr_name for feature computations.")
       }else{
-        vert_attr <- attr
+        vert_attr <- attr_name
       }
     }
     assortativity <-  igraph::assortativity.nominal(gr, types = c(1,2)[as.factor(igraph::vertex_attr(gr, vert_attr))])

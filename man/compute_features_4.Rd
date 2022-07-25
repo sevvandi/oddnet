@@ -4,7 +4,7 @@
 \alias{compute_features_4}
 \title{Computes features for each network}
 \usage{
-compute_features_4(gr, color = FALSE, attr = NULL)
+compute_features_4(gr, attributes = FALSE, attr_name = NULL)
 }
 \description{
 Computes features for each network

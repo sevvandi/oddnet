@@ -60,9 +60,9 @@ anomalous_networks <- function(networks,
     gr <- igraph::graph_from_adjacency_matrix(networks[[i]])
     if(vert_attr){  # if the vertices have attributes
       gr <- igraph::set_vertex_attr(gr, attr_name, value = attr_mat[[i]])
-      tt <- compute_features_4(gr, color= TRUE, attr = vert_attr)
+      tt <- compute_features_4(gr, attributes = TRUE, attr_name = vert_attr)
     }else{
-      tt <- compute_features_4(gr, color= FALSE, attr = NULL)
+      tt <- compute_features_4(gr, attributes = FALSE, attr_name = NULL)
     }
 
     features[i, ] <- unlist(tt[1:17])
