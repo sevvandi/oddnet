@@ -1,0 +1,57 @@
+#' @export
+anomalous_networks <- function(networks, alpha = 0.05, dd = 2, trim = 0.005, na_action = NULL,  vert_attr = FALSE, attr_name = NULL, attr_mat = NULL){
+  # networks is a list of adjacency matrices
+  # alpha is the parameter for lookout
+  # dd is the dimension for robust pca projection
+  # trim is to compute the trimmed mean and std dev
+  # vert_attr is null if there are no vertex attributes, if they are there, vert attr has the name of the attribute
+
+  num_networks <- length(networks)
+  features <- matrix(0, nrow = num_networks, ncol = 17)
+
+  # Compute network features
+  for(i in 1:num_networks){
+    gr <- igraph::graph_from_adjacency_matrix(networks[[i]])
+    if(vert_attr){  # if the vertices have attributes
+      gr <- igraph::set_vertex_attr(gr, attr_name, value = attr_mat[[i]])
+      tt <- compute_features_4(gr, color= TRUE, attr = vert_attr)
+    }else{
+      tt <- compute_features_4(gr, color= FALSE, attr = NULL)
+    }
+
+    features[i, ] <- unlist(tt[1:17])
+  }
+  colnames(features) <- names(tt)[1:17]
+
+  if(!is.null(na_action)){
+    features[is.na(features)] <- 0
+  }
+  # Make a long data frame
+  dfmerge <- tibble::as_tibble(features) %>%
+    dplyr::mutate(t = dplyr::row_number()) %>%
+    tidyr::pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+    tsibble::as_tsibble(index = t, key = feature)
+
+  # Fit ARIMA models
+  fit <- dfmerge %>%
+    fabletools::model(arima = fable::ARIMA(value))
+
+  # Save residuals
+  dfresiduals <- fabletools::augment(fit) %>%
+    dplyr::select(t, feature, .innov) %>%
+    tidyr::pivot_wider(names_from = feature, values_from = .innov) %>%
+    tsibble::as_tibble() %>%
+    dplyr::select(-t)
+
+  dfresiduals2 <- scale_trimmed(dfresiduals, trim = trim)
+
+  # PCA on all residuals
+  pca <- pcaPP::PCAproj(dfresiduals2, scale = NULL, center = NULL, k = dd)
+  dfpca <- tsibble::as_tibble(pca$scores) %>%
+    dplyr::mutate(t = dplyr::row_number()) %>%
+    tsibble::as_tsibble(index = t)
+
+  # Find outliers in PCs using lookout
+  lookobj <- lookout::lookout(dfpca[ ,1:dd], alpha = alpha)
+  lookobj
+}
