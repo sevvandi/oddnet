@@ -37,6 +37,7 @@
 #'
 #'
 #' @importFrom dplyr '%>%'
+#' @importFrom rlang .data
 #' @export anomalous_networks
 anomalous_networks <- function(networks,
                                alpha = 0.05,
@@ -71,7 +72,7 @@ anomalous_networks <- function(networks,
   dfmerge <- tibble::as_tibble(features) %>%
     dplyr::mutate(t = dplyr::row_number()) %>%
     tidyr::pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
-    tsibble::as_tsibble(index = t, key = feature)
+    tsibble::as_tsibble(index = t, key = .data$feature)
 
   # Fit ARIMA models
   fit <- dfmerge %>%
@@ -79,8 +80,8 @@ anomalous_networks <- function(networks,
 
   # Save residuals
   dfresiduals <- fabletools::augment(fit) %>%
-    dplyr::select(t, feature, .innov) %>%
-    tidyr::pivot_wider(names_from = feature, values_from = .innov) %>%
+    dplyr::select(t, .data$feature, .data$.innov) %>%
+    tidyr::pivot_wider(names_from = .data$feature, values_from = .data$.innov) %>%
     tsibble::as_tibble() %>%
     dplyr::select(-t)
 

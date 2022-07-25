@@ -15,7 +15,7 @@
 #' compute_features_4(gr)
 #'
 #'
-#' @importFrom stats median, quantile
+#' @importFrom stats median quantile
 #' @export compute_features_4
 compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
   # gr is an igraph object
