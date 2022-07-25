@@ -1,0 +1,1811 @@
+# --------------------------------------------------------------------------------------
+# TASK  01  : TRY ENTROPY - IGTS
+# TASK  02  : TRY KDE BOUNDARIES AND INTERSECTION IDES
+# TASK  03  : FB LIKE DATASET
+# TASK  04  : MAKE THE DATASET AS ROB SAID
+# TASK  05  : LOOK AT THE DIFFERENCES IN THE TIME SERIES
+# TASK  06  : TRY EVT FOR WITH CLUSTERING
+# TASK  07  : TRY FORECASTING THE VALUES
+# TASK  08  : GET RESIDUALS AND TRY THE 2D EVT METHOD
+# TASK  09  : TRY CHANGE POINT ANALYSIS METHODS
+# TASK  10  : TRY ALEC STEPHENSON'S SUGGESTIONS
+# TASK  11  : TRY TO GET bvgpd PROBABILITIES
+# TASK  12  : TRY 1D GPD ON MSE VALUES
+# TASK  13  : TRY compute_features FUNCTION
+# TASK  14  : OTHER DATASETS IN package = 'VCERGM'
+# TASK  15  : TRY US ELECTION BLOG DATASET
+# TASK  16  : TRY US AIRPORT DATASETS
+# TASK  17  : CANADIAN VOTING DATASET
+# TASK  18  : SIMULATE ERDOS RENYI/SMALLWORLD/PREF ATTACHMENT GRAPHS AND CHECK IF YOU GET THE ANOMALIES
+# TASK  19  : PLOT GRAPHS AND COMPUTE SUMMARIES
+# TASK  20  : CHECK anomalous_networks METHOD
+# TASK  21  : TRY reticulate PACKAGE FOR CALLING PYTHON FILES
+# --------------------------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------------------------
+# TASK  01  : TRY ENTROPY - IGTS
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+
+vcergmvals <- read.csv("Data_Output/Analysis_02/TASK_01/vcergmvals.csv")
+pcavergm <- prcomp(vcergmvals, scale = TRUE, center = TRUE)
+df <- data.frame(t = 1:74, pcavergm$x)
+ggplot(df, aes(PC1, PC2)) + geom_point(aes(color = t)) + geom_path() + coord_fixed()
+
+entropy_mv(pcavergm$x[1:5, ])
+
+lll <- c(1, 8, 63)
+lll <- c(1, 19, 36)
+info_gain(pcavergm$x, lll)
+
+lll <- c(1, 7, 45, 63)
+info_gain(pcavergm$x, lll)
+
+lll <- c(1, 1:6*10)
+lll <- c(1, 1:10*7)
+lll <- c(1, 1:14*5)
+lll <- c(1,8, 20, 30, 40,50, 60, 63)
+info_gain(pcavergm$x, lll)
+
+df <- data.frame(t = 1:74, pcavergm$x[ ,1:2])
+head(df)
+
+gg <- graph_from_data_frame(df, actors = t)
+plot(gg)
+
+median(dist(df[ ,-1]))
+
+distdf <- dist(df[ ,-1])
+
+which(distdf < 0.5)
+
+FNN::knn.dist()
+df2 <- cbind.data.frame(n1 = 1:(dim(df)[1]-1), n2=2:dim(df)[1] )
+
+gg <- make_graph_with_near_nodes(df, mindist = 0.1)
+plot(gg)
+
+clust <- cluster_louvain(gg)
+clust$membership
+
+
+# --------------------------------------------------------------------------------------
+# TASK  02  : TRY KDE BOUNDARIES AND INTERSECTION IDES
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+library(ks)
+
+vcergmvals <- read.csv("Data_Output/Analysis_02/TASK_01/vcergmvals.csv")
+pcavergm <- prcomp(vcergmvals, scale = TRUE, center = TRUE)
+df <- data.frame(t = 1:74, pcavergm$x)
+g1 <- ggplot(df, aes(PC1, PC2)) + geom_point(aes(color = t)) + geom_path() + coord_fixed()
+g1
+
+
+hmat <- diag((pcavergm$sdev^2)[1:2])
+fhat <- kde(x=df[1:6, 2:3], H = hmat)
+
+
+# Taken from ks package
+hts <- fhat$cont[99]
+scale <- 99/hts
+contour(fhat$eval.points[[1]], fhat$eval.points[[2]],
+        fhat$estimate * scale, level = hts * scale)
+contour(fhat$eval.points[[1]], fhat$eval.points[[2]],
+        fhat$estimate * scale, level = 99)
+points(df[1:6, 2:3])
+
+
+mesh <- AtmRay::meshgrid(fhat$eval.points[[1]], fhat$eval.points[[2]])
+inds <- which(as.vector(t(fhat$estimate)*scale) > 99)
+xr <- cbind.data.frame(x1 = as.vector(mesh$x[inds]), x2 = as.vector(mesh$y[inds]))
+xmean <- mean(mesh$x[inds])
+ymean <- mean(mesh$y[inds])
+g1 + geom_tile(data = xr, aes(x1, x2, fill = "red", alpha = 0.2)) + geom_text(x = xmean, y = ymean, label = paste('Rg', 1))
+
+# fhat2 <- kde(x=df[7:13, 2:3], H = hmat)
+# plot(fhat2)
+# hts2 <- fhat2$cont[99]
+# scale2 <- 99/hts2
+# contour(fhat2$eval.points[[1]], fhat2$eval.points[[2]],
+#         fhat2$estimate * scale2, level = hts2 * scale2)
+# contour(fhat$eval.points[[1]], fhat$eval.points[[2]],
+#         fhat$estimate * scale, level = hts * scale, add = TRUE)
+# points(df[1:9, 2:3])
+# points(df[10:20, 2:3])
+# points(df[31:40, 2:3])
+# points(df[41:50, 2:3])
+# points(df[51:60, 2:3])
+# points(df[61:70, 2:3])
+# points(df[71:74, 2:3])
+#
+# # try Polygons function
+# library(sp)
+# ?Polygon
+#
+# inds <- which(fhat$estimate * scale <= hts * scale)
+# mesh <- AtmRay::meshgrid(fhat$eval.points[[1]], fhat$eval.points[[2]])
+# hts2 <- fhat2$cont[99]
+# scale2 <- 99/hts2
+#
+# xr <- cbind.data.frame(x1 = as.vector(mesh$x[inds]), x2 = as.vector(mesh$y[inds]))
+# xr <- cbind.data.frame(x1 = as.vector(mesh$x), x2 = as.vector(mesh$y), z = as.vector(fhat$estimate)*scale)
+# g1 + geom_contour(data = xr, aes(x = x1, y=x2, z=z), breaks = c(99, 101))
+
+vcergmvals <- read.csv("Data_Output/Analysis_02/TASK_01/vcergmvals.csv")
+rrdetect <- regime_detection(vcergmvals, threshold = 0.2)
+rrdetect$regime_inds
+rrdetect$intersections
+plot_regimes(vcergmvals, rrdetect)
+
+rrall <- regime_all_regions(vcergmvals)
+plot_regimes(vcergmvals, rrall)
+
+ints <- find_regime_intersections(rrdetect$regimes)
+
+
+# --------------------------------------------------------------------------------------
+# TASK  03  : FB LIKE DATASET
+# --------------------------------------------------------------------------------------
+library(tnet)
+library(lubridate)
+library(dplyr)
+library(Matrix)
+library(VCERGM)
+
+dat <- tnet::OnlineSocialNetwork.n1899.lnet
+head(dat)
+dat$t <-  as_datetime(dat$t)
+dat$date <- as_date(dat$t)
+length(which(dat$i == dat$j))
+rminds <- which(dat$i == dat$j)
+dat2 <- dat[-rminds, ]
+hist(dat2$date, breaks = 20)
+
+dat3 <- dat2[ ,c("i", "j", "date")]
+colnames(dat3)[3] <- "day"
+len <- length(unique(dat3$day))
+uniq_dates <- as_date(unique(dat3$day))
+
+networks <- list()
+num_nodes <- length(unique(c(dat3$i, dat3$j)))
+for(i in 1:len){
+  temp <- dat3[which(dat3$day == uniq_dates[i]), 1:2]
+  temp <- as.matrix(temp, ncol = 2)
+  mat <- sparseMatrix(temp[ ,1],temp[ ,2],x=1)
+  mat[mat > 1] <- 1
+  networks[[i]] <- mat
+}
+
+object = Net ~ edges # +  gwesp(decay = 1,fixed=TRUE) # mutual did not work - gave an error saying directed needs to be true, but we set it to true
+directed = TRUE # Directed network
+# Degree of spline and number of knots for basis expansion
+degree.spline = 3
+interior.knot = 30
+
+
+vcergmest = estimate_vcergm(object = object, network = networks,
+                            degree.spline = degree.spline, interior.knot = interior.knot,
+                            directed = directed, constant = FALSE)
+vcergmest$phi.hat
+vcergmvals <- t(vcergmest$phi.hat)
+write.csv(vcergmvals, "Data_Output/Analysis_02/TASK_03/vcergmvals_fblike.csv", row.names = FALSE)
+
+regout <- regime_detection(as.vector(vcergmest$phi.hat))
+
+
+# --------------------------------------------------------------------------------------
+# TASK  04  : MAKE THE DATASET AS ROB SAID
+# --------------------------------------------------------------------------------------
+ergm_vals <- read.csv("Data_Output/Tutorial_05_VCERGM_1/ergmvals_US.csv")
+vcergm_vals <- read.csv("Data_Output/Analysis_02/TASK_01/vcergmvals.csv")
+
+library(VCERGM)
+library(igraph)
+
+networks = Rollcall$networks
+attr = Rollcall$attr
+degree_stats <- triangle_stats <- data.frame(fivep = numeric(), q1 = numeric(), median = numeric(), q3 = numeric(), ninetyfivep = numeric(), mean = numeric())
+efficiency <- conectivity <- isolates <- mean_dist <- assortativity <- edges <- rep(0, length(networks))
+clust_coeff <- data.frame(global_cc = numeric(), local_cc = numeric())
+clusters <- data.frame(num_clusts = numeric(), clust_size = numeric())
+for(i in 1:length(networks)){
+  gr <- graph_from_adjacency_matrix(networks[[i]])
+  gr <- set_vertex_attr(gr, "party", value = attr[[i]])
+  tr <- count_triangles(gr)
+  deg <- degree(gr)
+  triangle_stats[i, ] <- c(quantile(tr, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)), mean(tr))
+  degree_stats[i, ] <- c(quantile(deg, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)), mean(deg))
+  edges[i] <- gsize(gr)
+  clust_coeff[i, ] <- c(transitivity(gr), transitivity(gr, type = "average") )
+  assortativity[i] <-  assortativity.nominal(gr, types = c(1,2)[as.factor(vertex_attr(gr, 'party'))])
+  # mean_dist[i] <- mean_distance(gr)
+  # isolates[i] <- sum(deg == 0)/length(deg)  # isolated nodes percentage
+  # conectivity[i] <- cohesion(gr)
+  # efficiency[i] <- global_efficiency(gr)
+  # clust <- clusters(gr)
+  # clusters[i, ] <- c(clust$no, mean(clust$csize))
+}
+
+colnames(triangle_stats) <- paste("tr_", colnames(triangle_stats), sep="")
+colnames(degree_stats) <- paste("deg_", colnames(degree_stats), sep="")
+df <- cbind.data.frame(triangle_stats, degree_stats, edges, clust_coeff, assortativity)
+
+pca <- prcomp(df, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+df1 <- df[ ,c(6, 12, 14, 16)]
+pca <- prcomp(df1, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+dfergm <- t(ergm_vals)
+colnames(dfergm) <- c("triangle", "kstar2", "mix.attr1.Democrat.Republican", "mix.attr1.Republican.Republican" )
+dfergm[which(is.na(dfergm) == TRUE)] <- -10
+pca2 <- prcomp(dfergm, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca2$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+dfvcergm <- vcergm_vals
+pca2 <- prcomp(dfvcergm, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca2$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+dfmerge <- cbind.data.frame(df, dfergm)
+pca2 <- prcomp(dfmerge, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca2$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+pca3 <- prcomp(triangle_stats, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca3$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+pca3 <- prcomp(degree_stats, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca3$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+
+
+# write.csv(df, "Data_Output/Analysis_02/TASK_04/Network_Features.csv", row.names = FALSE)
+# write.csv(dfergm, "Data_Output/Analysis_02/TASK_04/ERGM_Stats.csv", row.names = FALSE)
+# write.csv(dfvcergm, "Data_Output/Analysis_02/TASK_04/VCERGM_Stats.csv", row.names = FALSE)
+# colnames(dfmerge) <- c("feat_triangles_5p", "feat_triangles_25p", "feat_triangles_50p", "feat_triangles_75p",
+#                        "feat_triangles_95p", "feat_triangles_mean", "feat_degree_5p", "feat_degree_25p",
+#                        "feat_degree_50p", "feat_degree_75p", "feat_degree_95p", "feat_degree_mean", "feat_edges",
+#                        "feat_global_clustering_coef", "feat_avg_clustering_coef", "feat_homophily", "ergm_triangle",
+#                        "ergm_kstar2", "ergm_demo_repub", "ergm_repub_repub")
+# write.csv(dfmerge, "Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv", row.names = FALSE)
+
+
+# --------------------------------------------------------------------------------------
+# TASK  05  : LOOK AT THE DIFFERENCES IN THE TIME SERIES
+# --------------------------------------------------------------------------------------
+dffeat <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features.csv")
+dfergm <- read.csv("Data_Output/Analysis_02/TASK_04/ERGM_Stats.csv")
+dfvcergm <- read.csv("Data_Output/Analysis_02/TASK_04/VCERGM_Stats.csv")
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+
+df <- dffeat[ ,c(6,12,13,14,16)]
+df <- dfmerge
+df <- dfergm
+df <- dfvcergm
+pca <- prcomp(df, scale = TRUE)
+df2 <- data.frame(time = 1:74, pca$x)
+ggplot(df2, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path()
+
+df2 <- apply(df, 2, diff)
+pca <- prcomp(df2, scale = TRUE)
+dfpca <- data.frame(time = 1:73, pca$x)
+ggplot(dfpca, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path() + coord_fixed()
+
+
+df3 <- apply(df2, 2, diff)
+pca <- prcomp(df3, scale = TRUE)
+dfpca <- data.frame(time = 1:72, pca$x)
+ggplot(dfpca, aes(PC1, PC2)) + geom_point(aes(col = time)) + geom_path() + coord_fixed()
+
+
+library(lookout)
+lobj <- lookout(df2, alpha = 0.1)
+lobj
+
+lobj <- lookout(df3, alpha = 0.1)
+lobj
+
+pca <- prcomp(df2, scale = TRUE)
+lobj <- lookout(pca$x[ ,1:2], alpha = 0.1)
+lobj
+
+
+pca <- prcomp(df3, scale = TRUE)
+lobj <- lookout(pca$x[ ,1:2], alpha = 0.1)
+lobj
+
+
+library(VCERGM)
+library(igraph)
+networks = Rollcall$networks
+attr = Rollcall$attr
+
+i <- 54
+# gr <- graph_from_adjacency_matrix(networks[[i]])
+# gr <- set_vertex_attr(gr, "party", value = attr[[i]])
+# plot(gr, vertex.color = c("blue", "red")[as.factor(vertex_attr(gr, 'party'))])
+
+# Convert a list of adjacency matrices into a list of network objects
+networks2 = from_adj_to_net(networks, attr)
+plot(networks2[[i]], vertex.col=c("blue", "red")[as.factor(attr[[i]])] )
+
+# --------------------
+# PLOT RAW TIME SERIES
+
+library(ggplot2)
+library(tidyr)
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+dfl <- pivot_longer(dfmerge2[ ,1:7], 2:7)
+ggplot(dfl, aes(x = t, y =  value, color = name)) + geom_line()
+
+
+dfl <- pivot_longer(dfmerge2[ ,c(1, 8:13)], 2:7)
+ggplot(dfl, aes(x = t, y =  value, color = name)) + geom_line()
+
+ggplot(dfmerge2, aes(x = t, y =  feat_edges)) + geom_line()
+
+dfl <- pivot_longer(dfmerge2[ ,c(1, 15:17)], 2:4)
+ggplot(dfl, aes(x = t, y =  value, color = name)) + geom_line()
+
+dfl <- pivot_longer(dfmerge2[ ,c(1, 18:21)], 2:5)
+ggplot(dfl, aes(x = t, y =  value, color = name)) + geom_line()
+
+
+# --------------------------------------------------------------------------------------
+# TASK  06  : TRY EVT FOR WITH CLUSTERING
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+library(tidyr)
+library(evd)
+
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+colnames(dfmerge2)
+
+ll <- 15
+xx <- -log(dfmerge2[ ,ll])
+xx <- dfmerge2[ ,ll]
+clusters(xx, u = 0.95, r =3, plot = TRUE)
+potobj <- fpot(xx, threshold = 0.9, "gpd", cmax = TRUE, r = 3)
+potobj
+gpd <- potobj$estimate[1L:2L]
+qq <- quantile(xx, probs = 0.9)
+potlookde <- evd::pgpd(xx, loc = qq, scale = gpd[1], shape = gpd[2], lower.tail = FALSE)
+
+
+# --------------------------------------------------------------------------------------
+# TASK  07  : TRY FORECASTING THE VALUES
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+library(tidyr)
+library(evd)
+library(fable)
+library(feasts)
+
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+
+as_tsibble(dfmerge2, index = t) %>% gg_tsdisplay(difference(feat_triangles_mean), plot_type='partial')
+
+
+
+# TRIANGLES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_triangles_mean),
+      search = ARIMA(feat_triangles_mean, stepwise=FALSE))
+fit
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$feat_triangles_mean)
+
+# DEGREE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_degree_mean),
+                                                 search = ARIMA(feat_degree_mean, stepwise=FALSE))
+fit
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$feat_degree_mean)
+
+# EDGES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_edges),
+                                                 search = ARIMA(feat_edges, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$feat_edges)
+
+# CLUSTERING COEFFICIENT
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_global_clustering_coef),
+                                                 search = ARIMA(feat_global_clustering_coef, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$feat_global_clustering_coef)
+
+# HOMOPHILY
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_homophily),
+                                                 search = ARIMA(feat_homophily, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+
+fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$feat_homophily)
+
+#  ERGM TRAINGLE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_triangle),
+                                                 search = ARIMA(ergm_triangle, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+
+fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$ergm_triangle)
+
+#  ERGM KSTAR2
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_kstar2),
+                                                 search = ARIMA(ergm_kstar2, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+
+fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$ergm_kstar2)
+
+#  ERGM DEMO-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_demo_repub),
+                                                 search = ARIMA(ergm_demo_repub, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+
+fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$ergm_demo_repub)
+
+#  ERGM REPUB-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_repub_repub),
+                                                 search = ARIMA(ergm_repub_repub, stepwise=FALSE))
+fit
+
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+
+fit %>%
+  select(stepwise) %>%
+  gg_tsresiduals()
+
+fit %>% select(stepwise) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>%  tsoutliers()
+
+fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) %>% tsoutliers()
+tsoutliers(dfmerge2$ergm_repub_repub)
+
+
+
+# --------------------------------------------------------------------------------------
+# TASK  08  : GET RESIDUALS AND TRY THE 2D EVT METHOD
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(evd)
+library(fable)
+library(feasts)
+
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+
+# TRIANGLES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_triangles_mean),
+                                                 search = ARIMA(feat_triangles_mean, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_triangles <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) #%>% abs()
+
+
+# DEGREE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_degree_mean),
+                                                 search = ARIMA(feat_degree_mean, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_degree <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# EDGES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_edges),
+                                                 search = ARIMA(feat_edges, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_edges <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# CLUSTERING COEFFICIENT
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_global_clustering_coef),
+                                                 search = ARIMA(feat_global_clustering_coef, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_clust <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# HOMOPHILY
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_homophily),
+                                                 search = ARIMA(feat_homophily, stepwise=FALSE))
+
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_homophily <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM TRAINGLE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_triangle),
+                                                 search = ARIMA(ergm_triangle, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_triangle <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM KSTAR2
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_kstar2),
+                                                 search = ARIMA(ergm_kstar2, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_kstar <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM DEMO-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_demo_repub),
+                                                 search = ARIMA(ergm_demo_repub, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_demo_repub <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM REPUB-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_repub_repub),
+                                                 search = ARIMA(ergm_repub_repub, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_repub_repub <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# PUT ALL RESIDUALS TOGETHER
+dfresiduals <- data.frame(feat_triangles = res_triangles,
+                          feat_degree = res_degree,
+                          feat_edges = res_edges,
+                          feat_clustering = res_clust,
+                          feat_homophily = res_homophily,
+                          ergm_triangle = res_erg_triangle,
+                          ergm_kstar2 = res_erg_kstar,
+                          ergm_demo_repub = res_erg_demo_repub,
+                          ergm_repub_repub = res_erg_repub_repub)
+
+write.csv(dfresiduals, "Data_Output/Analysis_02/TASK_04/arima_residuals.csv", row.names = FALSE)
+
+# # PCA
+# pca <- prcomp(dfresiduals, scale = TRUE)
+# plot(pca$x[ ,1:2], asp = 1)
+# screeplot(pca)
+
+
+# # FITTING THE MULTIVARIATE EVT
+# k0 <- bvtcplot(pca$x[ ,1:2])$k0
+# bvtcplot(pca$x[ ,1:2], spectral = TRUE)
+# thresh <- apply(pca$x[ ,1:2], 2, sort, decreasing = TRUE)[(k0+5)/2,]
+#
+# m1 <- fbvpot(pca$x[ ,1:2], thresh, model = "alog", asy1 = 1)
+# m2 <- fbvpot(pca$x[ ,1:2], thresh, model = "bilog")
+# m3 <- fbvpot(pca$x[ ,1:2], thresh, model = "bilog", likelihood = "poisson")
+#
+# round(rbind(fitted(m1), fitted(m2), fitted(m3)), 3)
+# round(rbind(std.errors(m1), std.errors(m2), std.errors(m3)), 3)
+
+
+
+# plot(pca$x[ ,1:2], col = "grey", asp = 1)
+# plot(m1, which = 3, p = c(0.95,0.975,0.99), tlty = 0, add = TRUE)
+# abline(v=thresh[1], h=thresh[2])
+#
+# pca$rotation
+
+
+# PLOT RESIDUALS
+library(GGally)
+ggpairs(dfresiduals)
+
+dfresiduals2 <- scale(dfresiduals, center = FALSE)
+res_add <- apply(dfresiduals2, 1, mean)
+power <- dim(dfresiduals2)[2]
+res_multi <- apply(dfresiduals2, 1, function(x) prod(x)^(1/power))
+dfres <- data.frame(addition = res_add, product = res_multi)
+plot(dfres)
+
+
+# FITTING THE MULTIVARIATE EVT
+k0 <- bvtcplot(dfres)$k0
+bvtcplot(dfres, spectral = TRUE)
+thresh <- apply(dfres, 2, sort, decreasing = TRUE)[(k0+5)/2,]
+
+m1 <- fbvpot(dfres, thresh, model = "alog", asy1 = 1, std.err = FALSE)
+m2 <- fbvpot(dfres, thresh, model = "bilog",std.err = FALSE)
+m3 <- fbvpot(dfres, thresh, model = "bilog", likelihood = "poisson")
+
+round(rbind(fitted(m1), fitted(m2), fitted(m3)), 3)
+round(rbind(std.errors(m1), std.errors(m2), std.errors(m3)), 3)
+
+
+
+plot(dfres, col = "grey")
+plot(m1, which = 3, p = c(0.9, 0.95,0.975,0.99), tlty = 0, add = TRUE)
+abline(v=thresh[1], h=thresh[2])
+
+cor(dfres)
+
+inds <- which(dfres[ ,1] > 1.2 & dfres[ ,2] > 0.9 )
+inds
+
+
+library(VCERGM)
+library(igraph)
+networks = Rollcall$networks
+attr = Rollcall$attr
+# Convert a list of adjacency matrices into a list of network objects
+networks2 = from_adj_to_net(networks, attr)
+
+j <- 3
+i <- c(inds[j] -1 , inds[j], inds[j]+1)
+plot(networks2[[i[1]]], vertex.col=c("blue", "red")[as.factor(attr[[i[1]]])], main = paste("Network", i[1]) )
+plot(networks2[[i[2]]], vertex.col=c("blue", "red")[as.factor(attr[[i[2]]])], main = paste("Network", i[2]) )
+plot(networks2[[i[3]]], vertex.col=c("blue", "red")[as.factor(attr[[i[3]]])], main = paste("Network", i[3]) )
+
+
+# probs <- pbvevd(dfres, dep=m1$dep.summary, model = m1$model)
+# which(probs < 0.1)
+
+
+# library(POT)
+# pbvgpd(dfres, alpha, model = m1$model, mar1 = )
+
+
+# plot(m1, which= 3)
+
+# --------------------------------------------------------------------------------------
+# TASK  09  : TRY CHANGE POINT ANALYSIS METHODS
+# --------------------------------------------------------------------------------------
+
+library(ecp)
+data("DJIA", package = "ecp")
+head(DJIA)
+head(DJIA[[3]])
+df <- DJIA[[3]]
+plot(df[ ,3])
+plot(DJIA[[2]])
+oo <- e.divisive(DJIA[[3]], sig.lvl = 0.05, R = 199, k = NULL, min.size = 30, alpha = 1)
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(evd)
+library(fable)
+library(feasts)
+
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+oo <- e.divisive(dfmerge, sig.lvl = 0.05, R = 199, k = NULL, min.size = 30, alpha = 1)
+oo
+
+
+dfdiff <- apply(dfmerge, 2, diff)
+head(dfdiff)
+oo2 <- e.divisive(dfdiff, sig.lvl = 0.05, R = 199, k = NULL, min.size = 30, alpha = 1)
+oo2
+
+
+library(changepoint.geo)
+ans <- geomcp(dfmerge)
+ans
+
+ans2 <- geomcp(dfdiff)
+ans2
+
+
+library(strucchange)
+dfresiduals <-  read.csv("Data_Output/Analysis_02/TASK_04/arima_residuals.csv")
+
+ecm.model <- feat_edges ~ feat_degree_mean + feat_triangles_mean
+ocus <- efp(ecm.model, type="OLS-CUSUM", data=dfmerge)
+plot(ocus)
+ocus$process
+ocus$nreg
+
+ecm.model <- feat_edges ~ feat_degree_mean + feat_triangles_mean + feat_global_clustering_coef + feat_homophily
+ocus <- efp(ecm.model, type="OLS-CUSUM", data=dfmerge, dynamic = TRUE)
+plot(ocus)
+points(ocus$process)
+
+ecm.model <-  ergm_triangle  ~  ergm_kstar2 + ergm_repub_repub + ergm_demo_repub
+ocus <- efp(ecm.model, type="OLS-CUSUM", data=dfmerge)
+plot(ocus)
+points(ocus$process)
+
+me <- efp(ecm.model, type="ME", data=dfmerge, h=0.1)
+plot(me)
+
+
+# --------------------------------------------------------------------------------------
+# TASK  10  : TRY ALEC STEPHENSON'S SUGGESTIONS
+# --------------------------------------------------------------------------------------
+library(evd)
+
+set.seed(1)
+bvdata <- rbvevd(1000, dep = 0.2, model = "log")
+u <- apply(bvdata, 2,  quantile, probs = 0.9)
+M1 <- fbvpot(bvdata, u, model = "log")
+# M2 <- fbvpot(bvdata, u, "log", dep = 0.5)
+
+
+plot(bvdata, col = "grey")
+plot(M1, which = 3, p = c(0.99), tlty = 0, add = TRUE)
+qc <- bvqc(M1, p = c(0.99))
+head(qc)
+bvdata[1, ]
+
+out <- points_over_threshold(bvdata, qc[[1]])
+# qc <- bvqc(M1, p = c(0.25, 0.5, 0.75, 0.9, 0.95,0.975,0.99))
+
+
+mar1 <- c(M1$threshold[1], M1$param[c("scale1", "shape1")])
+mar2 <- c(M1$threshold[2], M1$param[c("scale2", "shape2")])
+tdata <- mtransform(bvdata, list(mar1, mar2))
+
+tt <- pbvevd(tdata, dep = M1$dep.summary, model = "log", mar1 = mar1, mar2 = mar2, lower.tail = FALSE)
+sum(tt > 0.99)
+
+#sum(tt < 0.000123)
+
+plot(bvdata, col = "grey")
+plot(M1, which = 3, p = c(0.99), tlty = 0, add = TRUE)
+
+
+point <- which(tt > 0.99)
+points(bvdata[point, ], col = "red")
+
+# ------------------
+# using bvdata - not the way to go
+tt <- pbvevd(bvdata, dep = M1$dep.summary, model = "log", mar1 = mar1, mar2 = mar2,  lower.tail = FALSE)
+sum(tt < 0.01)
+
+plot(bvdata, col = "grey")
+plot(M1, which = 3, p = c(0.9, 0.95,0.975,0.99), tlty = 0, add = TRUE)
+
+point <- which(tt < 0.01)
+points(bvdata[point, ], col = "red")
+
+
+
+# --------------------------------------------------------------------------------------
+# TASK  11  : TRY TO GET THE PROBABILITIES FROM FBVPOT
+# --------------------------------------------------------------------------------------
+
+library(evd)
+library(POT)
+
+set.seed(1)
+bvdata <- rbvevd(1000, dep = 0.2, model = "log")
+u <- apply(bvdata, 2,  quantile, probs = 0.9)
+M1 <- fbvpot(bvdata, u, model = "log")
+M1$estimate
+M1$threshold
+M1$dep.summary
+
+plot(bvdata, col = "grey")
+#plot(M1, which = 3, p = c(0.99), tlty = 0, add = TRUE)
+qc <- bvqc(M1, p = c(0.95,0.975,0.99))
+
+mar1 <- c(M1$threshold[1], M1$param[c("scale1", "shape1")])
+mar2 <- c(M1$threshold[2], M1$param[c("scale2", "shape2")])
+
+
+# STEP 1
+# -------------------------------
+# What Alec suggested
+tdata <- mtransform(bvdata, list(mar1, mar2))
+tt <- pbvevd(tdata, dep = M1$dep.summary, model = "log", mar1 = mar1, mar2 = mar2)
+inds <- which(tt < 0.01)
+
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+# STEP 2
+# -------------------------------
+# Without using mtransform
+tt <- pbvevd(bvdata, dep = M1$dep.summary, model = "log", mar1 = mar1, mar2 = mar2, lower.tail = FALSE)
+
+inds <- which(tt < 0.01)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+inds <- which(tt < 0.025)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+inds <- which(tt < 0.05)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+# STEP 3
+# -------------------------------
+# use pbvgpd from POT package
+
+probs <- pbvgpd(bvdata, alpha = M1$dep.summary, model = M1$model,  mar1 = mar1, mar2 = mar2, lower.tail = FALSE )
+
+inds <- which(probs < 0.01)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+inds <- which(probs < 0.025)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+
+inds <- which(tt < 0.05)
+plot(bvdata, col = "grey")
+qc <- bvqc(M1, p = c(0.95,0.975, 0.99))
+points(bvdata[inds, ], col = "red")
+
+# --------------------------------------------------------------------------------------
+# TASK  12  : TRY 1D GPD ON MSE VALUES
+# --------------------------------------------------------------------------------------
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(evd)
+library(fable)
+library(feasts)
+
+dfmerge <- read.csv("Data_Output/Analysis_02/TASK_04/Network_Features_Merged_with_ERGM_Coefficients.csv")
+dfmerge2 <- cbind.data.frame(t = 1:74, dfmerge)
+
+# TRIANGLES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_triangles_mean),
+                                                 search = ARIMA(feat_triangles_mean, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_triangles <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# DEGREE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_degree_mean),
+                                                 search = ARIMA(feat_degree_mean, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_degree <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# EDGES
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_edges),
+                                                 search = ARIMA(feat_edges, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_edges <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# CLUSTERING COEFFICIENT
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_global_clustering_coef),
+                                                 search = ARIMA(feat_global_clustering_coef, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_clust <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# HOMOPHILY
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(feat_homophily),
+                                                 search = ARIMA(feat_homophily, stepwise=FALSE))
+
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_homophily <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM TRAINGLE
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_triangle),
+                                                 search = ARIMA(ergm_triangle, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_triangle <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM KSTAR2
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_kstar2),
+                                                 search = ARIMA(ergm_kstar2, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_kstar <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM DEMO-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_demo_repub),
+                                                 search = ARIMA(ergm_demo_repub, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_demo_repub <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+#  ERGM REPUB-REPUB
+fit <- as_tsibble(dfmerge2, index = t) %>% model(stepwise = ARIMA(ergm_repub_repub),
+                                                 search = ARIMA(ergm_repub_repub, stepwise=FALSE))
+fit
+fit %>%
+  select(search) %>%
+  gg_tsresiduals()
+res_erg_repub_repub <- fit %>% select(search) %>% residuals() %>%  select(.resid) %>% pull(.resid) # %>% abs()
+
+
+# PUT ALL RESIDUALS TOGETHER
+dfresiduals <- data.frame(feat_triangles = res_triangles,
+                          feat_degree = res_degree,
+                          feat_edges = res_edges,
+                          feat_clustering = res_clust,
+                          feat_homophily = res_homophily,
+                          ergm_triangle = res_erg_triangle,
+                          ergm_kstar2 = res_erg_kstar,
+                          ergm_demo_repub = res_erg_demo_repub,
+                          ergm_repub_repub = res_erg_repub_repub)
+
+# Try error squares
+dfres2 <- dfresiduals#[ ,1:5]
+dfres3 <- scale(dfres2)
+dfres4 <- dfres3^2
+ressums <- apply(dfres4, 1, sum)
+ressums
+
+library(evd)
+qq <- quantile(ressums, probs = 0.9)
+potobj <- evd::fpot(ressums, thresh = qq)
+gpd <- potobj$estimate[1L:2L]
+probs <- evd::pgpd(ressums, loc = qq,
+          scale = gpd[1], shape = gpd[2], lower.tail = FALSE)
+probs
+
+
+# Try absolute errors
+
+
+dfres2 <- dfresiduals#[ ,1:5]
+dfres3 <- scale(dfres2)
+dfres4 <- abs(dfres3)
+ressums <- apply(dfres4, 1, sum)
+ressums
+
+qq <- quantile(ressums, probs = 0.9)
+potobj <- evd::fpot(ressums, thresh = qq)
+gpd <- potobj$estimate[1L:2L]
+probs <- evd::pgpd(ressums, loc = qq,
+                   scale = gpd[1], shape = gpd[2], lower.tail = FALSE)
+probs
+which(probs < 0.05)
+order(probs)
+
+# https://history.house.gov/Historical-Highlights/1851-1900/The-historic-54th-Congress/
+# https://history.house.gov/Congressional-Overview/Profiles/54th/#:~:text=Congress%20Overview,limit%20immigration%20to%20the%20literate.
+unitize <- function(X) {
+  for (col in 1:NCOL(X)) {
+    maxcol <- max(X[, col])
+    mincol <- min(X[, col])
+    if(maxcol!= mincol){
+      X[, col] <- (X[, col] - mincol) / (maxcol - mincol)
+    }
+  }
+  X
+}
+
+dfres2 <- dfresiduals[ ,1:5]
+dfres3 <- unitize(dfres2)
+dfres4 <- dfres3
+ressums <- apply(dfres4, 1, sum)
+ressums
+
+qq <- quantile(ressums, probs = 0.8)
+potobj <- evd::fpot(ressums, thresh = qq)
+gpd <- potobj$estimate[1L:2L]
+probs <- evd::pgpd(ressums, loc = qq,
+                   scale = gpd[1], shape = gpd[2], lower.tail = FALSE)
+probs
+
+# --------------------------------------------------------------------------------------
+# TASK  13  : TRY compute_features FUNCTION
+# --------------------------------------------------------------------------------------
+ergm_vals <- read.csv("Data_Output/Tutorial_05_VCERGM_1/ergmvals_US.csv")
+vcergm_vals <- read.csv("Data_Output/Analysis_02/TASK_01/vcergmvals.csv")
+
+library(VCERGM)
+library(igraph)
+library(rlang)
+library(evd)
+
+networks = Rollcall$networks
+attr = Rollcall$attr
+num_networks <- length(networks)
+mat <- matrix(0, nrow = num_networks, ncol = 16)
+
+for(i in 1:num_networks){
+  gr <- graph_from_adjacency_matrix(networks[[i]])
+  gr <- set_vertex_attr(gr, "party", value = attr[[i]])
+  tt <- compute_features(gr)
+  mat[i, ] <- unlist(tt[1:16])
+}
+colnames(mat) <- names(tt)[1:16]
+features <- cbind.data.frame(t = 40:113, mat)
+
+residuals <- matrix(0, nrow = NROW(features), ncol = NCOL(mat))
+for(kk in 1:NCOL(mat)){
+  fit <- as_tsibble(features, index = t) %>%
+    model(search = ARIMA(!!as.name(names(tt)[kk]),
+                         stepwise=FALSE))
+  residuals[ ,kk] <- fit %>%
+    select(search) %>%
+    residuals() %>%
+    select(.resid) %>%
+    pull(.resid)
+}
+
+scaled_resid <- scale(residuals)
+absres <- apply(abs(scaled_resid), 1, sum)
+
+# POT calculation
+qq <- quantile(absres, probs = 0.9)
+potobj <- evd::fpot(absres, thresh = qq, std.err = FALSE)
+gpd <- potobj$estimate[1L:2L]
+probs <- evd::pgpd(absres, loc = qq,
+                   scale = gpd[1], shape = gpd[2], lower.tail = FALSE)
+probs
+congress <- 40:113
+which(probs < 0.05)
+congress[which(probs < 0.05)]
+congress[order(probs)]
+
+# --------------------------------------------------------------------------------------
+# TASK  14  : OTHER DATASETS IN package = 'VCERGM'
+# --------------------------------------------------------------------------------------
+library(VCERGM)
+
+
+networks1 <- fMRI1
+length(networks1)
+networks2 <- fMRI2
+length(networks2)
+networks3 <- fMRI3
+length(networks3)
+networks4 <- fMRI4
+length(networks4)
+networks5 <- fMRI5
+length(networks5)
+
+
+
+# --------------------------------------------------------------------------------------
+# TASK  15  : TRY US ELECTION BLOG DATASET
+# --------------------------------------------------------------------------------------
+library(dnr)
+library(igraph)
+
+data(rdNets)
+party <- c(rep("Democrat", 34), rep("Republican", 13))
+party[23] <- "common"
+
+plot(rdNets[[484]], vertex.col=c( "yellow", "blue", "red")[as.factor(party)], main = paste("Network") )
+
+
+mat <- as.matrix(rdNets[[345]])
+plot(rdNets[[345]])
+gr <- graph_from_adjacency_matrix(mat)
+gr <- set_vertex_attr(gr, "party", value = party)
+plot(gr)
+
+
+
+# --------------------------------------------------------------------------------------
+# TASK  16  : TRY US AIRPORT DATASETS
+# --------------------------------------------------------------------------------------
+library(tnet)
+data(package = "tnet")
+data('USairport.n500.net')
+
+
+# --------------------------------------------------------------------------------------
+# TASK  17  : CANADIAN VOTING DATASET
+# --------------------------------------------------------------------------------------
+library(igraph)
+library(fpp3)
+library(GGally)
+library(lookout)
+library(stray)
+library(pcaPP)
+library(VCERGM)
+library(igraph)
+library(rlang)
+library(dnr)
+
+
+dat <- read.csv("Data_Input/Canadian_Votes_Edgelist.csv", header = FALSE)
+unique(dat$V2)
+colnames(dat) <- c("Year", "From", "To", "Weight")
+years <- unique(dat$Year)
+num_years <- length(years)
+
+mat <- matrix(0, nrow = num_years, ncol = 24)
+
+for(i in 1:num_years){
+  yearr <- years[i]
+  datwin <- dat[dat$Year == yearr, 1:3]
+  gr <- graph_from_data_frame(datwin)
+  tt <- compute_features_3(gr, color= FALSE)
+  mat[i, ] <- unlist(tt[1:24])
+}
+
+
+colnames(mat) <- names(tt)[1:24]
+apply(mat, 2, function(x)sum(is.na(x)))
+
+mat <- mat[ ,-8]
+
+dfmerge <- as_tibble(mat) %>%
+  mutate(t = row_number()) %>%
+  pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+  as_tsibble(index = t, key = feature)
+
+as_tibble(mat) %>%
+  mutate(t = row_number()) %>%
+  pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+  as_tsibble(index = t, key = feature) %>%
+  autoplot() +
+  facet_wrap(~feature, scales = "free") +
+  theme(legend.position = "none")
+
+
+# Fit ARIMA models
+fit <- dfmerge %>%
+  model(arima = ARIMA(value))
+
+# Save residuals
+dfresiduals <- augment(fit) %>%
+  select(t, feature, .innov) %>%
+  pivot_wider(names_from = feature, values_from = .innov) %>%
+  as_tibble() %>%
+  select(-t)
+
+# Plot residuals for some features
+dfresiduals %>%
+  select(
+    betweenness_50,
+    closeness_50,
+    cluster_size_50,
+    conectivity,
+    cores_50,
+    degree_50,
+    diameter,
+    isolates,
+    pagerank_50,
+    triangles_50
+  ) %>%
+  ggpairs(dfresiduals)
+
+
+apply(dfresiduals, 2, function(x)sum(is.na(x)))
+inds <- which(apply(dfresiduals, 2, mad) == 0 )
+inds <- which(apply(dfresiduals, 2, sd) == 0 )
+
+
+dfresiduals2 <- dfresiduals[ ,-inds]  # because connectivitiy has mad = 0
+# PCA on all residuals
+pca <- PCAproj(dfresiduals2, scale = mad, center = median, k = 6)
+dfpca <- as_tibble(pca$scores) %>%
+  mutate(t = row_number()) %>%
+  as_tsibble(index = t)
+
+# Plot PCs
+dfpca %>%
+  pivot_longer(Comp.1:Comp.6, names_to = "Component", values_to = "Score") %>%
+  autoplot(Score)
+
+dfpca %>%
+  pivot_longer(Comp.1:Comp.6, names_to = "Component", values_to = "Score") %>%
+  autoplot(Score) +
+  facet_wrap(~Component)
+
+dfpca %>%
+  ggplot(aes(x = Comp.1, y = Comp.2)) +
+  geom_point() +
+  coord_fixed()
+
+# Find outliers in PCs using lookout and stray
+lookobj <- lookout(dfpca[ ,1:2], alpha = 0.1)
+strout <- stray::find_HDoutliers(dfpca[, 1:6], alpha = 0.1)
+dfpca <- dfpca %>%
+  mutate(
+    lookout = (t %in% lookobj$outliers$Outliers),
+    stray = (t %in% strout$outliers)
+  )
+
+dfpca %>%
+  ggplot(aes(x = Comp.1, y = Comp.2)) +
+  geom_point() +
+  geom_point(data = dfpca %>% filter(lookout), col = "red") +
+  geom_text(data = dfpca %>% filter(lookout), aes(label = t), col = "red") +
+  coord_fixed()
+
+dfpca %>%
+  ggplot(aes(x = Comp.3, y = Comp.4)) +
+  geom_point() +
+  geom_point(data = dfpca %>% filter(lookout), col = "red") +
+  geom_text(data = dfpca %>% filter(lookout), aes(label = t), col = "red") +
+  coord_fixed()
+
+
+# --------------------------------------------------------------------------------------
+# TASK  18  : SIMULATE ERDOS RENYI GRAPHS AND CHECK IF YOU GET THE ANOMALIES
+# --------------------------------------------------------------------------------------
+library(dplyr)
+library(igraph)
+library(lookout)
+library(fable)
+library(tidyr)
+library(pcaPP)
+
+set.seed(2022)
+outliers <- list()
+outp <- c(0.1, 0.15, 0.2, 0.25)
+num_reps <- 10
+for(kkk in 1:4){
+  outpval <- outp[kkk]
+  for(lll in 1:num_reps){
+    num_networks <- 100
+    mat <- matrix(0, nrow = num_networks, ncol = 24)
+    p.or.m.seq <- rep(0.05, 100)
+    p.or.m.seq[50] <- outpval
+    #p.or.m.seq[75] <- outpval
+
+
+    for(i in 1:num_networks){
+      gr <- erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+      tt <- compute_features_3(gr, color= FALSE)
+      mat[i, ] <- unlist(tt[1:24])
+    }
+
+    colnames(mat) <- names(tt)[1:24]
+    apply(mat, 2, function(x)sum(is.na(x)))
+
+    dfmerge <- as_tibble(mat) %>%
+      mutate(t = row_number()) %>%
+      pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+      as_tsibble(index = t, key = feature)
+
+
+    # Fit ARIMA models
+    fit <- dfmerge %>%
+      model(arima = ARIMA(value))
+
+    # Save residuals
+    dfresiduals <- augment(fit) %>%
+      select(t, feature, .innov) %>%
+      pivot_wider(names_from = feature, values_from = .innov) %>%
+      as_tibble() %>%
+      select(-t)
+
+
+    # apply(dfresiduals, 2, function(x)sum(is.na(x)))
+    # inds <- which(apply(dfresiduals, 2, mad) == 0 )
+    inds <- which(apply(dfresiduals, 2, sd) == 0 )
+
+
+    dfresiduals2 <- dfresiduals[ ,-inds]  # because connectivitiy has mad = 0
+    # PCA on all residuals
+    pca <- PCAproj(dfresiduals2, scale = sd, center = median, k = 6)
+    dfpca <- as_tibble(pca$scores) %>%
+      mutate(t = row_number()) %>%
+      as_tsibble(index = t)
+
+
+    # Find outliers in PCs using lookout and stray
+    lookobj <- lookout(dfpca[ ,1:2], alpha = 0.1)
+    mmm <- lll + (kkk-1)*num_reps
+    if(nrow(lookobj$outliers) == 0){
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, NA, NA)
+    }else{
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, lookobj$outliers)
+    }
+
+  }
+}
+
+# save(outliers, file ="Data_Output/TASK_18/Erdos_Renyi_Graph_Anomalies_1.RData")
+
+# ------------------------------------------------
+# Barabasi model - Preferential Attachment
+
+set.seed(2022)
+outliers <- list()
+outp <- c(1.25, 1.5, 1.75, 2)
+num_reps <- 10
+for(kkk in 1:4){
+  outpval <- outp[kkk]
+  for(lll in 1:num_reps){
+    num_networks <- 100
+    mat <- matrix(0, nrow = num_networks, ncol = 24)
+    power_seq <- rep(1.1, 100)
+    power_seq[50] <- outpval
+   # power_seq[75] <- outpval
+
+
+    for(i in 1:num_networks){
+      gr <- barabasi.game(1000, power = power_seq[i])
+      tt <- compute_features_3(gr, color= FALSE)
+      mat[i, ] <- unlist(tt[1:24])
+    }
+
+    colnames(mat) <- names(tt)[1:24]
+    ind <- which(apply(mat, 2, function(x)sum(is.na(x))) > 0 )
+    if(length(ind) > 0){
+      mat <- mat[ ,-ind]
+    }
+
+
+    dfmerge <- as_tibble(mat) %>%
+      mutate(t = row_number()) %>%
+      pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+      as_tsibble(index = t, key = feature)
+
+
+    # Fit ARIMA models
+    fit <- dfmerge %>%
+      model(arima = ARIMA(value))
+
+    # Save residuals
+    dfresiduals <- augment(fit) %>%
+      select(t, feature, .innov) %>%
+      pivot_wider(names_from = feature, values_from = .innov) %>%
+      as_tibble() %>%
+      select(-t)
+
+
+    # apply(dfresiduals, 2, function(x)sum(is.na(x)))
+    # inds <- which(apply(dfresiduals, 2, mad) == 0 )
+    inds <- which(apply(dfresiduals, 2, sd) == 0 )
+
+
+    dfresiduals2 <- dfresiduals[ ,-inds]  # because connectivitiy has mad = 0
+    # PCA on all residuals
+    pca <- PCAproj(dfresiduals2, scale = sd, center = median, k = 6)
+    dfpca <- as_tibble(pca$scores) %>%
+      mutate(t = row_number()) %>%
+      as_tsibble(index = t)
+
+
+    # Find outliers in PCs using lookout and stray
+    lookobj <- lookout(dfpca[ ,1:2], alpha = 0.1)
+    mmm <- lll + (kkk-1)*num_reps
+    if(nrow(lookobj$outliers) == 0){
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, Outliers = NA, Probability = NA)
+    }else{
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, lookobj$outliers)
+    }
+
+  }
+}
+
+
+# save(outliers, file = "Data_Output/TASK_18/Barabasi_Graph_Anomalies_1.RData")
+
+
+# ------------------------------------------------
+# Watts-Strogatz small world model
+
+set.seed(2022)
+outliers <- list()
+outp <- c(0.1, 0.15, 0.2, 0.25)
+num_reps <- 10
+for(kkk in 1:4){
+  outpval <- outp[kkk]
+  for(lll in 1:num_reps){
+    num_networks <- 100
+    mat <- matrix(0, nrow = num_networks, ncol = 24)
+    pp <- rep(0.05, 100)
+    pp[50] <- outpval
+    #pp[75] <- outpval
+
+
+    for(i in 1:num_networks){
+      gr <- sample_smallworld(1, 100, 5, pp[i])
+      tt <- compute_features_3(gr, color= FALSE)
+      mat[i, ] <- unlist(tt[1:24])
+    }
+
+    colnames(mat) <- names(tt)[1:24]
+    ind <- which(apply(mat, 2, function(x)sum(is.na(x))) > 0 )
+    if(length(ind) > 0){
+      mat <- mat[ ,-ind]
+    }
+
+
+    dfmerge <- as_tibble(mat) %>%
+      mutate(t = row_number()) %>%
+      pivot_longer(cols = -t, values_to = "value", names_to = "feature") %>%
+      as_tsibble(index = t, key = feature)
+
+
+    # Fit ARIMA models
+    fit <- dfmerge %>%
+      model(arima = ARIMA(value))
+
+    # Save residuals
+    dfresiduals <- augment(fit) %>%
+      select(t, feature, .innov) %>%
+      pivot_wider(names_from = feature, values_from = .innov) %>%
+      as_tibble() %>%
+      select(-t)
+
+
+    # apply(dfresiduals, 2, function(x)sum(is.na(x)))
+    # inds <- which(apply(dfresiduals, 2, mad) == 0 )
+    inds <- which(apply(dfresiduals, 2, sd) == 0 )
+
+
+    dfresiduals2 <- dfresiduals[ ,-inds]  # because connectivitiy has mad = 0
+    # PCA on all residuals
+    pca <- PCAproj(dfresiduals2, scale = sd, center = median, k = 6)
+    dfpca <- as_tibble(pca$scores) %>%
+      mutate(t = row_number()) %>%
+      as_tsibble(index = t)
+
+
+    # Find outliers in PCs using lookout and stray
+    lookobj <- lookout(dfpca[ ,1:2], alpha = 0.1)
+    mmm <- lll + (kkk-1)*num_reps
+    if(nrow(lookobj$outliers) == 0){
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, Outliers = NA, Probability = NA)
+    }else{
+      outliers[[mmm]] <- cbind.data.frame(kkk, lll, outpval, lookobj$outliers)
+    }
+
+  }
+}
+
+
+# save(outliers, file = "Data_Output/TASK_18/Small_World_Graph_Anomalies_1.RData")
+
+# --------------------------------------------------------------------------------------
+# TASK  19  : PLOT GRAPHS AND COMPUTE SUMMARIES
+# --------------------------------------------------------------------------------------
+
+diff_metrics <- function(act, pred) {
+  # positives to be denoted by 1 and negatives with 0
+  stopifnot(length(act) == length(pred))
+  n <- length(act)
+  tp <- sum((act == 1) & (pred == 1))
+  tn <- sum((act == 0) & (pred == 0))
+  fp <- sum((act == 0) & (pred == 1))
+  fn <- sum((act == 1) & (pred == 0))
+  prec <- (tp + tn) / n
+  sn <- tp / (tp + fn)
+  sp <- tn / (tn + fp)
+  precision <- if_else(
+    (tp + fp) == 0,
+    0,
+    tp / (tp + fp)
+  )
+  recall <- tp / (tp + fn)
+  fmeasure <- if_else(
+    (precision == 0) & (recall == 0),
+    0,
+    2 * precision * recall / (precision + recall)
+  )
+  tibble(
+    N = n,
+    true_pos = tp,
+    true_neg = tn,
+    false_pos = fp,
+    false_neg = fn,
+    accuracy = prec,
+    sensitivity = sn,
+    specificity = sp,
+    gmean = sqrt(sn * sp),
+    precision = precision,
+    recall = recall,
+    fmeasure = fmeasure
+  )
+}
+
+
+load(file = "Data_Output/TASK_18/Small_World_Graph_Anomalies_2.RData")
+outliers
+
+num_out <- 2
+method <- "Small_World"
+num_net <- 100
+labs <- rep(0, num_net)
+if(num_out == 1){
+  labs[50] <- 1
+}else if(num_out == 2){
+  labs[c(50, 75)] <- 1
+}
+sum(labs)
+
+
+for(ii in 1:length(outliers)){
+  out <- outliers[[ii]]
+  preds <- rep(0, num_net)
+  preds[out$Outliers] <- 1
+  rec <- cbind(kkk = out$kkk[1], lll= out$lll[1], para = out$outpval[1], diff_metrics(labs, preds))
+  if(ii == 1){
+    rec_all <- rec
+  }else{
+    rec_all <- rbind.data.frame(rec_all, rec)
+  }
+}
+
+colnames(rec_all)
+apply(rec_all[ ,10:12], 2, mean)
+summary_dat <- rec_all %>%
+  select(para, sensitivity, specificity, gmean) %>%
+  group_by(para) %>%
+  summarize(sensitivity_m = mean(sensitivity), specificity_m = mean(specificity), gmean_m = mean(gmean)) %>%
+  mutate(outliers = num_out, method = method)
+
+# summary_all <- summary_dat
+
+summary_all <- bind_rows(summary_all, summary_dat)
+write.csv(summary_all, "Data_Output/TASK_19/Simulation_Summary.csv", row.names = FALSE)
+
+# rec2 <- rec_all[ ,c(3, 10:12)]
+# reclong <- pivot_longer(rec2, cols=2:4)
+# colnames(reclong)[2] <- "Metric"
+#
+# # reclong[ ,1] <- as.factor(reclong[ ,1])
+#
+# library(ggplot2)
+# ggplot(reclong, aes(as.factor(para), value)) +
+#   geom_boxplot() +
+#   facet_wrap(~Metric) +
+#   xlab("Parameter") +
+#   ylab("Value")
+#
+
+# --------------------------------------------------------------------------------------
+# TASK  20  : CHECK anomalous_networks METHOD
+# --------------------------------------------------------------------------------------
+# US SENATOR VOTING DATASET
+library(VCERGM)
+networks = Rollcall$networks
+attr = Rollcall$attr
+out <- anomalous_networks(networks, alpha = 0.1, vert_attr = TRUE, attr_name = 'party', attr_mat = attr)
+out
+
+# ----------------------------------------
+# Canadian voting dataset - WORKED
+dat <- read.csv("Data_Input/Canadian_Votes_Edgelist.csv", header = FALSE)
+head(dat)
+colnames(dat) <- c("Year", "From", "To", "Weight")
+years <- unique(dat$Year)
+num_years <- length(years)
+vset <- unique(sort(c(dat[ ,2], dat[ ,3])))
+
+matlist <- list()
+
+for(i in 1:num_years){
+  yearr <- years[i]
+  datwin <- dat[dat$Year == yearr, 2:3]
+  gr <- igraph::graph_from_data_frame(datwin, vertices = vset)
+  admat <- igraph::as_adjacency_matrix(gr)
+  matlist[[i]] <- admat
+}
+
+out <- anomalous_networks(matlist, alpha = 0.1, trim = 0.005, vert_attr = FALSE)
+out
+
+
+# ----------------------------------------
+# UCI message dataset
+library(lubridate)
+dat <- tnet::OnlineSocialNetwork.n1899.lnet
+head(dat)
+dat$t <-  as_datetime(dat$t)
+dat$date <- as_date(dat$t)
+length(which(dat$i == dat$j))
+rminds <- 1:8 # which(dat$i == dat$j)
+dat2 <- dat[-rminds, ]
+
+dat3 <- dat2[ ,c("i", "j", "date")]
+len <-  length(unique(dat3$date))
+unique_dates <- unique(dat3$date)
+num_networks <- length(unique_dates)
+vset <- unique(sort(c(dat3[ ,1], dat3[ ,2])))
+
+
+matlist <- list()
+for(i in 1:length(unique_dates)){
+  nn <- unique_dates[i]
+  inds <- which( dat3$date == nn )
+  datwin <- dat3[inds, 1:2]
+  gr <- igraph::graph_from_data_frame(datwin, vertices = vset)
+  admat <- igraph::as_adjacency_matrix(gr)
+  matlist[[i]] <- admat
+}
+
+out <- anomalous_networks(matlist, alpha = 0.1, na_action=1, trim = 0.005, vert_attr = FALSE)
+out
+unique_dates[out$outliers[ ,1]]
+
+
+# ----------------------------------------
+# Physics citations dataset
+library(igraph)
+library(dplyr)
+library(lubridate)
+
+## Read data
+times <- read.csv("Data_Input/cit-HepPh/cit-HepPh-dates_2.csv")
+df2 <- read.csv("Data_Input/cit-HepPh/Cit-HepPh-Dynamic_char_fixed_1.csv")
+df3 <- df2 %>%
+  mutate(
+    Date = ymd(Date),
+    Month_Yr = format_ISO8601(Date, precision = "ym")
+  )
+times_df <- times %>%
+  mutate(
+    Date = ymd(Date),
+    Month_Yr = format_ISO8601(Date, precision = "ym")
+  )
+
+num_networks <- length(unique(df3$Month_Yr))
+mat <- matrix(0, nrow = num_networks, ncol = 24)
+months <- sort(unique(df3$Month_Yr))
+
+matlist <- list()
+for(win in 1:num_networks){
+  inds <- which(df3$Month_Yr %in% months[win])
+  datwin <- df3[inds, ]
+  lonenodes <- unique(times_df[which(times_df$Month_Yr <= months[win]), 1])
+  allnodes <- unique(c(lonenodes, datwin$FromNodeId, datwin$ToNodeId))
+  gr <- igraph::graph_from_data_frame(datwin, vertices = allnodes )
+  admat <- igraph::as_adjacency_matrix(gr)
+  matlist[[win]] <- admat
+}
+
+out <- anomalous_networks(matlist, alpha = 0.1, na_action=1, trim = 0.005, vert_attr = FALSE)
+out
+months <- sort(unique(df3$Month_Yr))
+anomalies <- months[out$outliers[ ,1]]
+anomalies
+
+
+# ----------------------------------------
+# US blog posts
+library(dnr)
+data(rdNets)
+party <- c(rep("Democrat", 34), rep("Republican", 13))
+party[23] <- "common"
+networks <- rdNets
+
+matlist <- list()
+num_networks <- length(networks)
+for(i in 1:num_networks){
+  matlist[[i]] <- as.matrix(networks[[i]])
+}
+
+
+matlist2 <- matlist[-(345:346)]
+out <- anomalous_networks(matlist2, alpha = 0.1, trim = 0.005, vert_attr = FALSE)
+out
+
+
+# --------------------------------------------------------------------------------------
+# TASK  21  : TRY reticulate PACKAGE FOR CALLING PYTHON FILES
+# --------------------------------------------------------------------------------------
+library(reticulate)
+setwd('C:/Users/sevva/OneDrive/Documents/repos/LAD-master')
+py_run_file("Real_Command.py")

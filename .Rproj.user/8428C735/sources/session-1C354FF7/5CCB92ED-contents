@@ -1,5 +1,51 @@
-#' @export
-anomalous_networks <- function(networks, alpha = 0.05, dd = 2, trim = 0.005, na_action = NULL,  vert_attr = FALSE, attr_name = NULL, attr_mat = NULL){
+#' Identifies anomalous networks from a series of temporal networks.
+#'
+#' This function identifies anomalous networks from a series of temporal networks. It uses graph
+#' theoretic features to transform networks to a feature space. This function has parameters for
+#' feature computation, scaling, robust PCA and anomaly detection procedures.   ADD MORE DESCRIPTION.
+#'
+#' @param networks The input series of temporal networks given in a list with each network denoted
+#' by its adjacency matrix.
+#' @param alpha An anomaly detection parameter. The level of significance for the anomaly detection
+#' algorithm lookout. Default is 0.05.
+#' @param dd A robust PCA parameter. The number of reduced dimensions in robust PCA. Default is 2.
+#' @param trim A scaling parameter. The percentage used to compute trimmed mean and trimmed standard
+#' deviation. Default is 0.5 percent.
+#' @param na_action The action for NA valued features.
+#' @param vert_attr A feature computation parameter. If \code{TRUE} the network nodes/vertices have
+#' attributes.
+#' @param attr_name A feature computation parameter. The name of the network vertex attribute. Only a
+#' single attribute can be specified.
+#' @param attr_mat A feature computation parameter. If network nodes/vertices have attributes, the list of attribute
+#'  matrices for each network can be given using this feature.
+#'
+#'
+#' @return Object imported from lookout.
+#' @seealso [lookout::lookout()]
+#'
+#' @examples
+#' set.seed(1)
+#' networks <- list()
+#' p.or.m.seq <- rep(0.05, 100)
+#' p.or.m.seq[50] <- 0.2  # outlying network at 50
+#' for(i in 1:100){
+#'   gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+#'   networks[i] <- igraph::as_adjacency_matrix(gr)
+#' }
+#' anomalous_networks(networks)
+#'
+#'
+#'
+#' @importFrom dplyr '%>%'
+#' @export anomalous_networks
+anomalous_networks <- function(networks,
+                               alpha = 0.05,
+                               dd = 2,
+                               trim = 0.005,
+                               na_action = NULL,
+                               vert_attr = FALSE,
+                               attr_name = NULL,
+                               attr_mat = NULL){
   # networks is a list of adjacency matrices
   # alpha is the parameter for lookout
   # dd is the dimension for robust pca projection
