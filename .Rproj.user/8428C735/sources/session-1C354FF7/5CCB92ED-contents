@@ -30,7 +30,7 @@
 #' p.or.m.seq[50] <- 0.2  # outlying network at 50
 #' for(i in 1:100){
 #'   gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
-#'   networks[i] <- igraph::as_adjacency_matrix(gr)
+#'   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 #' }
 #' anomalous_networks(networks)
 #'
