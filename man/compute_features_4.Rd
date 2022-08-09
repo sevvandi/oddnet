@@ -4,7 +4,7 @@
 \alias{compute_features_4}
 \title{Computes features for each network.}
 \usage{
-compute_features_4(gr, attributes = FALSE, attr_name = NULL)
+compute_features_4(gr, attributes = FALSE, attr_name = NULL, fast = FALSE)
 }
 \arguments{
 \item{gr}{The network or graph as an \code{igraph} object.}
@@ -13,6 +13,8 @@ compute_features_4(gr, attributes = FALSE, attr_name = NULL)
 
 \item{attr_name}{The name of the node/vertex attribute. Only a single attribute can
 be specified.}
+
+\item{fast}{If set to \code{TRUE} will avoid computing time consuming features.}
 }
 \value{
 A network features object.

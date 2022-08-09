@@ -12,7 +12,8 @@ anomalous_networks(
   na_action = NULL,
   vert_attr = FALSE,
   attr_name = NULL,
-  attr_mat = NULL
+  attr_mat = NULL,
+  fast = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ single attribute can be specified.}
 
 \item{attr_mat}{A feature computation parameter. If network nodes/vertices have attributes, the list of attribute
 matrices for each network can be given using this feature.}
+
+\item{fast}{If set to \code{TRUE} will avoid computing time consuming features.}
 }
 \value{
 Object imported from lookout.

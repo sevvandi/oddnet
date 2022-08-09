@@ -18,6 +18,7 @@
 #' single attribute can be specified.
 #' @param attr_mat A feature computation parameter. If network nodes/vertices have attributes, the list of attribute
 #'  matrices for each network can be given using this feature.
+#' @param fast If set to \code{TRUE} will avoid computing time consuming features.
 #'
 #'
 #' @return Object imported from lookout.
@@ -47,7 +48,8 @@ anomalous_networks <- function(networks,
                                na_action = NULL,
                                vert_attr = FALSE,
                                attr_name = NULL,
-                               attr_mat = NULL){
+                               attr_mat = NULL,
+                               fast = FALSE){
 
 
   num_networks <- length(networks)
@@ -60,7 +62,7 @@ anomalous_networks <- function(networks,
       gr <- igraph::set_vertex_attr(gr, attr_name, value = attr_mat[[i]])
       tt <- compute_features_4(gr, attributes = TRUE, attr_name = vert_attr)
     }else{
-      tt <- compute_features_4(gr, attributes = FALSE, attr_name = NULL)
+      tt <- compute_features_4(gr, attributes = FALSE, attr_name = NULL, fast)
     }
 
     features[i, ] <- unlist(tt[1:17])

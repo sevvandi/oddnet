@@ -6,6 +6,7 @@
 #' @param attributes If the network nodes/vertices have attributes, then \code{attributes = TRUE}.
 #' @param attr_name The name of the node/vertex attribute. Only a single attribute can
 #' be specified.
+#' @param fast If set to \code{TRUE} will avoid computing time consuming features.
 #'
 #' @return A network features object.
 #'
@@ -17,7 +18,7 @@
 #'
 #' @importFrom stats median quantile
 #' @export compute_features_4
-compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
+compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL, fast = FALSE){
   # gr is an igraph object
   # triangles, degree and edges
 
@@ -50,7 +51,12 @@ compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
   mean_dist <- igraph::mean_distance(gr)
   diam <- igraph::diameter(gr)
   isolates <- sum(degobj == 0)/length(degobj)  # isolated nodes percentage
-  conectivity <- igraph::cohesion(gr)
+  if(!fast){
+    conectivity <- igraph::cohesion(gr)
+  }else{
+    conectivity <- NA
+  }
+
   # efficiency
   efficiency <- igraph::global_efficiency(gr)
   # number of clusters and cluster size
@@ -82,7 +88,7 @@ compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL){
     mean_distance = mean_dist,
     diameter = diam,
     isolates = isolates,
-    conectivity = conectivity,
+    connectivity = conectivity,
     efficiency = efficiency,
     num_clusters = num_clust,
     cluster_size_95 = clust_size_95,
