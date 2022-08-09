@@ -6,7 +6,7 @@ context_matrix <- function(matlist, k = NULL){
   context <- matrix(0, nrow = k, ncol = len)
   for(ii in 1:len){
     adjacency <- matlist[[ii]]
-    gr <- graph_from_adjacency_matrix(adjacency)
+    gr <- igraph::graph_from_adjacency_matrix(adjacency)
     # diag_degree <- diag(degree(gr))
     # laplacian <- diag_degree - adjacency
     laplacian <- igraph::laplacian_matrix(gr)
@@ -37,6 +37,7 @@ lad_scores <- function(context, win_width ){
 }
 
 
+#' @importFrom utils read.csv
 lad <- function(matlist, k = NULL, short_win, long_win, alpha = 0.05, from_file = NULL){
   # compute the context matrix
   if(!is.null(from_file)){
