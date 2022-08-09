@@ -70,6 +70,13 @@ anomalous_networks <- function(networks,
   if(!is.null(na_action)){
     features[is.na(features)] <- 0
   }
+  # Remove features with all NA or NaN values
+  na_sum <- apply(features, 2, function(x) sum(is.na(x)))
+  inds <- which(na_sum == num_networks)
+  if(length(inds) > 0){
+    features <- features[ ,-inds]
+  }
+
   # Make a long data frame
   dfmerge <- tibble::as_tibble(features) %>%
     dplyr::mutate(t = dplyr::row_number()) %>%
