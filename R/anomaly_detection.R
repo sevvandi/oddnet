@@ -53,21 +53,21 @@ anomalous_networks <- function(networks,
 
 
   num_networks <- length(networks)
-  features <- matrix(0, nrow = num_networks, ncol = 17)
+  num_feat <- 20 # 26 # 26 for compute_features_6
+  features <- matrix(0, nrow = num_networks, ncol = num_feat)
 
   # Compute network features
   for(i in 1:num_networks){
     gr <- igraph::graph_from_adjacency_matrix(networks[[i]])
     if(vert_attr){  # if the vertices have attributes
       gr <- igraph::set_vertex_attr(gr, attr_name, value = attr_mat[[i]])
-      tt <- compute_features_4(gr, attributes = TRUE, attr_name = vert_attr)
+      tt <- compute_features(gr, attributes = TRUE, attr_name = attr_name)
     }else{
-      tt <- compute_features_4(gr, attributes = FALSE, attr_name = NULL, fast)
+      tt <- compute_features(gr, attributes = FALSE, attr_name = NULL, fast)
     }
-
-    features[i, ] <- unlist(tt[1:17])
+    features[i, ] <- unlist(tt[1:num_feat])
   }
-  colnames(features) <- names(tt)[1:17]
+  colnames(features) <- names(tt)[1:num_feat]
 
   if(!is.null(na_action)){
     features[is.na(features)] <- 0
@@ -75,6 +75,11 @@ anomalous_networks <- function(networks,
   # Remove features with all NA or NaN values
   na_sum <- apply(features, 2, function(x) sum(is.na(x)))
   inds <- which(na_sum == num_networks)
+  if(length(inds) > 0){
+    features <- features[ ,-inds]
+  }
+  # Remove features with constant values
+  inds <- which(apply(features, 2, sd)==0)
   if(length(inds) > 0){
     features <- features[ ,-inds]
   }

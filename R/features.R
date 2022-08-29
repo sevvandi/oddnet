@@ -13,22 +13,23 @@
 #' @examples
 #' set.seed(1)
 #' gr <- igraph::erdos.renyi.game(100, 0.05)
-#' compute_features_4(gr)
+#' compute_features(gr)
 #'
 #'
-#' @importFrom stats median quantile
-#' @export compute_features_4
-compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL, fast = FALSE){
+#' @importFrom stats median quantile sd
+#' @export compute_features
+compute_features <- function(gr, attributes = FALSE, attr_name = NULL, fast = FALSE){
   # gr is an igraph object
   # triangles, degree and edges
-
+  # compute_features_5
   triangles <- igraph::count_triangles(gr)
   triangles_50 <- median(triangles)
-  triangles_95 <- quantile(triangles, probs = 0.95)
+  triangles_99 <- quantile(triangles, probs = 0.99)
   degobj <- igraph::degree(gr)
   degree_50 <- median(degobj)
-  degree_95 <- quantile(degobj, probs = 0.95)
+  degree_99 <- quantile(degobj, probs = 0.99)
   edges <- igraph::gsize(gr)
+  density <- igraph::edge_density(gr)
   num_nodes <- length(degobj)
   # clustering coefficient
   clust_coeff <- igraph::transitivity(gr)
@@ -43,7 +44,9 @@ compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL, fast = 
         vert_attr <- attr_name
       }
     }
-    assortativity <-  igraph::assortativity.nominal(gr, types = c(1,2)[as.factor(igraph::vertex_attr(gr, vert_attr))])
+    uniq_vals <- unique(igraph::vertex_attr(gr, vert_attr))
+    num_set <- 1:length(uniq_vals)
+    assortativity <-  igraph::assortativity.nominal(gr, types = num_set[as.factor(igraph::vertex_attr(gr, vert_attr))])
   }else{
     assortativity <- igraph::assortativity_degree(gr)
   }
@@ -64,25 +67,31 @@ compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL, fast = 
   num_clust <- clust$no
   clust_obj <- clust$csize
   clust_size_50 <- median(clust_obj)
-  clust_size_95 <- quantile(clust_obj, probs = 0.95)
+  clust_size_99 <- quantile(clust_obj, probs = 0.99)
   # centrality measures
   close_obj <- igraph::closeness(gr)
   closeness_50 <- median(close_obj, na.rm = TRUE)
-  closeness_95 <- quantile(close_obj, na.rm = TRUE, probs = 0.95)
+  closeness_99 <- quantile(close_obj, na.rm = TRUE, probs = 0.99)
+  close_overpoint8 <- sum(close_obj >= 0.8, na.rm = TRUE)/length(close_obj)
   between_obj <- igraph::betweenness(gr)
   between_50 <- median(between_obj, na.rm = TRUE)
-  between_95 <- quantile(between_obj, na.rm = TRUE, probs = 0.95)
+  between_99 <- quantile(between_obj, na.rm = TRUE, probs = 0.99)
   pagerank_obj <- igraph::page_rank(gr)$vector
   pagerank_50 <- median(pagerank_obj)
-  pagerank_95 <- quantile(pagerank_obj, probs = 0.95)
+  pagerank_99 <- quantile(pagerank_obj, probs = 0.99)
   cores_obj <- igraph::coreness(gr)
   cores_50 <- median(cores_obj)
-  cores_95 <- quantile(cores_obj, probs = 0.95)
+  cores_99 <- quantile(cores_obj, probs = 0.99)
+  hubs_obj <- igraph::hub_score(gr, scale = FALSE)
+  hubs <- hubs_obj$value
+  authority_obj <- igraph::authority_score(gr, scale = FALSE)
+  authority <- authority_obj$value
   structure(list(
     num_nodes = num_nodes,
-    triangles_95 = triangles_95,
-    degree_95 = degree_95,
+    triangles_99 = triangles_99,
+    degree_99 = degree_99,
     edges = edges,
+    density = density,
     clustering_coef = clust_coeff,
     assortativity = assortativity,
     mean_distance = mean_dist,
@@ -91,12 +100,13 @@ compute_features_4 <- function(gr, attributes = FALSE, attr_name = NULL, fast = 
     connectivity = conectivity,
     efficiency = efficiency,
     num_clusters = num_clust,
-    cluster_size_95 = clust_size_95,
-    closeness_95 = closeness_95,
-    betweenness_95 = between_95,
-    pagerank_95 = pagerank_95,
-    cores_95 = cores_95,
+    cluster_size_99 = clust_size_99,
+    close_overpoint8 = close_overpoint8,
+    betweenness_99 = between_99,
+    pagerank_99 = pagerank_99,
+    cores_99 = cores_99,
+    hubs_value = hubs,
+    authority_value = authority,
     call = match.call()),
     class='networkfeatures')
 }
-
