@@ -14,13 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# oddnet
+# oddnet <img src="man/img/oddnet.png" width = 140 align="right" />
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/sevvandi/oddnet/workflows/R-CMD-check/badge.svg)](https://github.com/sevvandi/oddnet/actions)
   <!-- badges: end -->
 
-The goal of oddnet is to identify anomalous networks from a series of temporal networks. 
+The goal of oddnet is to identify anomalous networks from a series of temporal networks.
 
 ## Installation
 

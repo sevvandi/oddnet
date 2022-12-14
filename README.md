@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# oddnet
+# oddnet <img src="man/img/oddnet.png" width = 140 align="right" />
 
 <!-- badges: start -->
 
@@ -51,5 +51,5 @@ anom
 #> Call: lookout::lookout(X = dfpca[, 1:dd], alpha = alpha)
 #> 
 #>   Outliers Probability
-#> 1       50           0
+#> 1       50 0.004614923
 ```
