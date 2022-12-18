@@ -2,6 +2,7 @@
 
 export(anomalous_networks)
 export(compute_features)
+export(lad)
 importFrom(dplyr,'%>%')
 importFrom(rlang,.data)
 importFrom(stats,median)

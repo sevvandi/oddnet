@@ -19,7 +19,6 @@ Imports:
     dplyr,
     fable,
     fabletools,
-    feasts,
     igraph,
     lookout,
     pcaPP,
@@ -28,5 +27,8 @@ Imports:
     tibble,
     tidyr,
     tsibble,
-    urca,
     utils
+Suggests: 
+    feasts,
+    urca,
+    VCERGM

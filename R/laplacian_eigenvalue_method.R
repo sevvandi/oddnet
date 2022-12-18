@@ -36,8 +36,28 @@ lad_scores <- function(context, win_width ){
   scores
 }
 
-
+#' Laplacian Eigen Value method by Shenyang Huang, Yasmeen Hitti, Guillaume Rabusseau
+#' and Reihaneh Rabbany from their KDD'20 paper Laplacian Change Point Detection for Dynamic Graphs
+#'
+#' @param matlist The matrix list, where each matrix is an adjacency matrix of the graph.
+#' @param k The number of eigen values to connsider
+#' @param short_win The length of the shorter windows
+#' @param long_win The length of the longer windows
+#' @param alpha The threshold to declare anomalies
+#' @param from_file This is an additional parameter only if a file needs to be read
 #' @importFrom utils read.csv
+#'
+#' @examples
+#' library(VCERGM)
+#' networks <- Rollcall$networks
+#' ladobj <- lad(networks, short_win = 5, long_win = 10)
+#'
+#'@references Huang, S., Hitti, Y., Rabusseau, G., & Rabbany, R. (2020). Laplacian Change
+#'Point Detection for Dynamic Graphs. Proceedings of the ACM SIGKDD International Conference
+#'on Knowledge Discovery and Data Mining, 349–358. https://doi.org/10.1145/3394486.3403077
+
+#'
+#' @export
 lad <- function(matlist, k = NULL, short_win, long_win, alpha = 0.05, from_file = NULL){
   # compute the context matrix
   if(!is.null(from_file)){
@@ -71,3 +91,5 @@ lad <- function(matlist, k = NULL, short_win, long_win, alpha = 0.05, from_file 
   ), class='lad')
 
 }
+
+
