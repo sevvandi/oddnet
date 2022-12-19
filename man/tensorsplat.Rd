@@ -16,6 +16,21 @@ tensorsplat(matlist, k = 2, alpha = 0.05)
 \description{
 Implements Danai Koutra's TensorSplat algorithm
 }
+\examples{
+# We generate a series of networks and add an anomaly at 50th network.
+set.seed(1)
+networks <- list()
+p.or.m.seq <- rep(0.05, 100)
+p.or.m.seq[50] <- 0.2  # outlying network at 50
+for(i in 1:100){
+  gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+  networks[[i]] <- igraph::as_adjacency_matrix(gr)
+}
+tensobj <- tensorsplat(networks, k = 2)
+
+
+
+}
 \references{
 Koutra, D., Papalexakis, E. E., & Faloutsos, C. (2012).
 TensorSplat: Spotting latent anomalies in time. Proceedings of the 2012 16th

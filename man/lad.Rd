@@ -25,6 +25,7 @@ Laplacian Eigen Value method by Shenyang Huang, Yasmeen Hitti, Guillaume Rabusse
 and Reihaneh Rabbany from their KDD'20 paper Laplacian Change Point Detection for Dynamic Graphs
 }
 \examples{
+# We generate a series of networks and add an anomaly at 50th network.
 set.seed(1)
 networks <- list()
 p.or.m.seq <- rep(0.05, 100)

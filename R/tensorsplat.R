@@ -5,7 +5,7 @@
 #' @param alpha The threshold to declare anoalies
 #'
 #' @examples
-#' \dontrun{
+#' # We generate a series of networks and add an anomaly at 50th network.
 #' set.seed(1)
 #' networks <- list()
 #' p.or.m.seq <- rep(0.05, 100)
