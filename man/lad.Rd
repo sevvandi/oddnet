@@ -25,32 +25,15 @@ Laplacian Eigen Value method by Shenyang Huang, Yasmeen Hitti, Guillaume Rabusse
 and Reihaneh Rabbany from their KDD'20 paper Laplacian Change Point Detection for Dynamic Graphs
 }
 \examples{
-\dontrun{
-library(tnet)
-library(lubridate)
-data(tnet)
-dat <- tnet::OnlineSocialNetwork.n1899.lnet
-dat$t <-  as_datetime(dat$t)
-dat$date <- as_date(dat$t)
-length(which(dat$i == dat$j))
-rminds <- which(dat$i == dat$j)
-dat2 <- dat[-rminds, ]
-dat3 <- dat2[ ,c("i", "j", "date")]
-len <-  length(unique(dat3$date))
-unique_dates <- unique(dat3$date)
-num_networks <- length(unique_dates)
-vset <- unique(sort(c(dat3[ ,1], dat3[ ,2])))
-matlist <- list()
-for(i in 1:20){
-  nn <- unique_dates[i]
-  inds <- which( dat3$date == nn )
-  datwin <- dat3[inds, 1:2]
-  gr <- graph_from_data_frame(datwin, vertices = vset)
-  admat <- as_adjacency_matrix(gr)
-  matlist[[i]] <- admat
+set.seed(1)
+networks <- list()
+p.or.m.seq <- rep(0.05, 100)
+p.or.m.seq[50] <- 0.2  # outlying network at 50
+for(i in 1:100){
+  gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+  networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
-ladobj <- lad(matlist, k = 6,  short_win = 7, long_win = 14)
-}
+ladobj <- lad(networks, k = 6, short_win = 2, long_win = 4)
 
 }
 \references{

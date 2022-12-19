@@ -1,4 +1,30 @@
-tensorsplat <- function(matlist, k = 5, alpha = 0.05 ){
+#' Implements Danai Koutra's TensorSplat algorithm
+#'
+#' @param matlist The list of matrices where each matrix denotes the adjacency matrix of the network.
+#' @param k The number of components in PARFAC tensor decomposition.
+#' @param alpha The threshold to declare anoalies
+#'
+#' @examples
+#' \dontrun{
+#' set.seed(1)
+#' networks <- list()
+#' p.or.m.seq <- rep(0.05, 100)
+#' p.or.m.seq[50] <- 0.2  # outlying network at 50
+#' for(i in 1:100){
+#'   gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+#'   networks[[i]] <- igraph::as_adjacency_matrix(gr)
+#' }
+#' tensobj <- tensorsplat(networks, k = 2)
+#'
+#'
+#'
+#' @references Koutra, D., Papalexakis, E. E., & Faloutsos, C. (2012).
+#' TensorSplat: Spotting latent anomalies in time. Proceedings of the 2012 16th
+#' Panhellenic Conference on Informatics, PCI 2012, 144–149.
+#' https://doi.org/10.1109/PCi.2012.60
+#'
+#' @export
+tensorsplat <- function(matlist, k = 2, alpha = 0.05 ){
   nn <- dim(matlist[[1]])[1]
   for(i in 1:length(matlist)){
     numrows <- dim(matlist[[i]])[1]
@@ -13,11 +39,6 @@ tensorsplat <- function(matlist, k = 5, alpha = 0.05 ){
   }
   network_tensor <- rTensor::as.tensor(arr);
 
-  # for(i in 1:length(matlist)){
-  #   numrows <- dim(matlist[[i]])[1]
-  #   network_tensor[i, 1:numrows, 1:numrows] <- matlist[[i]] # as.matrix(matlist[[i]])
-  # }
-
   cp_decomp <- rTensor::cp(network_tensor, num_components=3)
   temp_factors <- cp_decomp$U[[1]]
   lofout <- DDoutlier::LOF(temp_factors, k)
@@ -27,23 +48,4 @@ tensorsplat <- function(matlist, k = 5, alpha = 0.05 ){
 }
 
 
-# tensorsplat2 <- function(matlist, k = 5 ){
-#   nn <- dim(matlist[[1]])[1]
-#   for(i in 1:length(matlist)){
-#     numrows <- dim(matlist[[i]])[1]
-#     nn <- max(nn, numrows)
-#   }
-#
-#   indices <- c(length(matlist), nn, nn)
-#   arr <- array(0, dim = indices)
-#   for(i in 1:length(matlist)){
-#     numrows <- dim(matlist[[i]])[1]
-#     arr[i, , ] <- as.matrix(matlist[[i]])
-#   }
-#
-#
-#   cp_decomp <-multiway::parafac(arr, nfac = 3, nstart = 1)
-#   temp_factors <- cp_decomp$U[[1]]
-#   lofout <- DDoutlier::LOF(temp_factors, k)
-#   lofout
-# }
+
