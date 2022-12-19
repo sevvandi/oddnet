@@ -26,6 +26,7 @@
 #'
 #' @examples
 #' # We generate a series of networks and add an anomaly at 50th network.
+#' \dontrun{
 #' set.seed(1)
 #' networks <- list()
 #' p.or.m.seq <- rep(0.05, 100)
@@ -35,7 +36,7 @@
 #'   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 #' }
 #' anomalous_networks(networks)
-#'
+#'}
 #'
 #'
 #' @importFrom dplyr '%>%'

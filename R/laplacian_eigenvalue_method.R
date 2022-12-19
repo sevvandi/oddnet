@@ -49,6 +49,7 @@ lad_scores <- function(context, win_width ){
 #'
 #' @examples
 #' # We generate a series of networks and add an anomaly at 50th network.
+#' \dontrun{
 #' set.seed(1)
 #' networks <- list()
 #' p.or.m.seq <- rep(0.05, 100)
@@ -58,6 +59,7 @@ lad_scores <- function(context, win_width ){
 #'   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 #' }
 #' ladobj <- lad(networks, k = 6, short_win = 2, long_win = 4)
+#'}
 #'
 #'@references Huang, S., Hitti, Y., Rabusseau, G., & Rabbany, R. (2020). Laplacian Change
 #'Point Detection for Dynamic Graphs. Proceedings of the ACM SIGKDD International Conference
