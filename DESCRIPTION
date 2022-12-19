@@ -37,3 +37,4 @@ Suggests:
     rTensor,
     urca
 VignetteBuilder: knitr
+URL: https://sevvandi.github.io/oddnet
