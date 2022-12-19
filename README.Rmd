@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# oddnet <img src="man/img/oddnet.png" width = 140 align="right" />
+# oddnet <img src="man/figures/oddnet.png" width = 140 align="right" />
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/sevvandi/oddnet/workflows/R-CMD-check/badge.svg)](https://github.com/sevvandi/oddnet/actions)
@@ -33,7 +33,7 @@ devtools::install_github("sevvandi/oddnet")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+In this example we generate a series of networks and add an anomalous network at location 50.
 
 ```{r example}
 library(oddnet)

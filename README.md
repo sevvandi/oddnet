@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# oddnet <img src="man/img/oddnet.png" width = 140 align="right" />
+# oddnet <img src="man/figures/oddnet.png" width = 140 align="right" />
 
 <!-- badges: start -->
 
@@ -23,7 +23,8 @@ devtools::install_github("sevvandi/oddnet")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+In this example we generate a series of networks and add an anomalous
+network at location 50.
 
 ``` r
 library(oddnet)
@@ -51,5 +52,5 @@ anom
 #> Call: lookout::lookout(X = dfpca[, 1:dd], alpha = alpha)
 #> 
 #>   Outliers Probability
-#> 1       50 0.004614923
+#> 1       50           0
 ```

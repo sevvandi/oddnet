@@ -1,15 +1,18 @@
 Package: oddnet
 Type: Package
 Title: Anomaly Detection in Temporal Networks
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(person("Sevvandi", "Kandanaarachchi", email = "sevvandik@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0337-0395")),
     person("Rob", "Hyndman", email = "rob.hyndman@monash.edu",
     role = c("aut"), comment = c(ORCID = "0000-0002-2140-5352")) 
     )
 Maintainer: Sevvandi Kandanaarachchi <sevvandik@gmail.com>
-Description: Anomaly detection in dynamic, temporal networks. 
-    Use four spaces when indenting paragraphs within the Description.
+Description: Anomaly detection in dynamic, temporal networks. Oddnet uses a 
+    feature-based method to identify anomalies. First, it computes many 
+    features for each network. Then it models the features using time series 
+    methods. Using time series residuals it detects anomalies. This way, the 
+    temporal dependencies are accounted for when identifying anomalies. 
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -29,5 +32,8 @@ Imports:
 Suggests: 
     DDoutlier,
     feasts,
+    knitr,
+    rmarkdown,
     rTensor,
     urca
+VignetteBuilder: knitr

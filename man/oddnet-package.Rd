@@ -5,7 +5,7 @@
 \alias{oddnet-package}
 \title{oddnet: Anomaly Detection in Temporal Networks}
 \description{
-Anomaly detection in dynamic, temporal networks. Use four spaces when indenting paragraphs within the Description.
+Anomaly detection in dynamic, temporal networks. Oddnet uses a feature-based method to identify anomalies. First, it computes many features for each network. Then it models the features using time series methods. Using time series residuals it detects anomalies. This way, the temporal dependencies are accounted for when identifying anomalies.
 }
 \author{
 \strong{Maintainer}: Sevvandi Kandanaarachchi \email{sevvandik@gmail.com} (\href{https://orcid.org/0000-0002-0337-0395}{ORCID})
