@@ -20,23 +20,27 @@ lad(matlist, k = NULL, short_win, long_win, alpha = 0.05, from_file = NULL)
 
 \item{from_file}{This is an additional parameter only if a file needs to be read}
 }
+\value{
+An object of class lad. LAD is a window based method. It considers short and a long
+windows.  The lad object has anomalous scores when taking into account short and long windows
+along with the identified anomalies for both short and long windows.
+}
 \description{
 Laplacian Eigen Value method by Shenyang Huang, Yasmeen Hitti, Guillaume Rabusseau
 and Reihaneh Rabbany from their KDD'20 paper Laplacian Change Point Detection for Dynamic Graphs
 }
 \examples{
 # We generate a series of networks and add an anomaly at 50th network.
-\dontrun{
 set.seed(1)
 networks <- list()
-p.or.m.seq <- rep(0.05, 100)
-p.or.m.seq[50] <- 0.2  # outlying network at 50
-for(i in 1:100){
+p.or.m.seq <- rep(0.05, 50)
+p.or.m.seq[20] <- 0.2  # anomalous network at 20
+for(i in 1:50){
   gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
 ladobj <- lad(networks, k = 6, short_win = 2, long_win = 4)
-}
+ladobj
 
 }
 \references{

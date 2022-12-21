@@ -17,7 +17,7 @@ be specified.}
 \item{fast}{If set to \code{TRUE} will avoid computing time consuming features.}
 }
 \value{
-A network features object.
+A network features object containing 20 graph-theoretic features.
 }
 \description{
 This function computes features for each network using graph theoretic constructs.

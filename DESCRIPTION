@@ -8,11 +8,12 @@ Authors@R: c(person("Sevvandi", "Kandanaarachchi", email = "sevvandik@gmail.com"
     role = c("aut"), comment = c(ORCID = "0000-0002-2140-5352")) 
     )
 Maintainer: Sevvandi Kandanaarachchi <sevvandik@gmail.com>
-Description: Anomaly detection in dynamic, temporal networks. Oddnet uses a 
-    feature-based method to identify anomalies. First, it computes many 
-    features for each network. Then it models the features using time series 
+Description: Anomaly detection in dynamic, temporal networks. The package 
+    'oddnet' uses a feature-based method to identify anomalies. First, it computes 
+    many features for each network. Then it models the features using time series 
     methods. Using time series residuals it detects anomalies. This way, the 
-    temporal dependencies are accounted for when identifying anomalies. 
+    temporal dependencies are accounted for when identifying anomalies 
+    (Kandanaarachchi, Hyndman 2022) <doi:10.48550/arXiv.2210.07407>.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -37,4 +38,4 @@ Suggests:
     rTensor,
     urca
 VignetteBuilder: knitr
-URL: https://sevvandi.github.io/oddnet
+URL: https://sevvandi.github.io/oddnet/

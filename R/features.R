@@ -8,7 +8,7 @@
 #' be specified.
 #' @param fast If set to \code{TRUE} will avoid computing time consuming features.
 #'
-#' @return A network features object.
+#' @return A network features object containing 20 graph-theoretic features.
 #'
 #' @examples
 #' set.seed(1)
