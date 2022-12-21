@@ -5,7 +5,7 @@
 \alias{oddnet-package}
 \title{oddnet: Anomaly Detection in Temporal Networks}
 \description{
-Anomaly detection in dynamic, temporal networks. The package 'oddnet' uses a feature-based method to identify anomalies. First, it computes many features for each network. Then it models the features using time series methods. Using time series residuals it detects anomalies. This way, the temporal dependencies are accounted for when identifying anomalies (Kandanaarachchi, Hyndman 2022) \doi{10.48550/arXiv.2210.07407}.
+Anomaly detection in dynamic, temporal networks. The package 'oddnet' uses a feature-based method to identify anomalies. First, it computes many features for each network. Then it models the features using time series methods. Using time series residuals it detects anomalies. This way, the temporal dependencies are accounted for when identifying anomalies (Kandanaarachchi, Hyndman 2022) \href{https://arxiv.org/abs/2210.07407}{arXiv:2210.07407}.
 }
 \seealso{
 Useful links:
