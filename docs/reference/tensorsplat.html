@@ -59,9 +59,15 @@
 
 
 <dt>alpha</dt>
-<dd><p>The threshold to declare anoalies</p></dd>
+<dd><p>The threshold to declare anomalies</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>Anomalous observations</p>
+    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Koutra, D., Papalexakis, E. E., &amp; Faloutsos, C. (2012).
@@ -73,17 +79,18 @@ https://doi.org/10.1109/PCi.2012.60</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># We generate a series of networks and add an anomaly at 50th network.</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">networks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">p.or.m.seq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">p.or.m.seq</span><span class="op">[</span><span class="fl">50</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.2</span>  <span class="co"># outlying network at 50</span></span></span>
+<span class="r-in"><span><span class="va">p.or.m.seq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p.or.m.seq</span><span class="op">[</span><span class="fl">20</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.2</span>  <span class="co"># anomalous network at 20</span></span></span>
 <span class="r-in"><span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/erdos.renyi.game.html" class="external-link">erdos.renyi.game</a></span><span class="op">(</span><span class="fl">100</span>, p.or.m <span class="op">=</span> <span class="va">p.or.m.seq</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">networks</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html" class="external-link">as_adjacency_matrix</a></span><span class="op">(</span><span class="va">gr</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">tensobj</span> <span class="op">&lt;-</span> <span class="fu">tensorsplat</span><span class="op">(</span><span class="va">networks</span>, k <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |===                                                                   |   4%  |                                                                              |======                                                                |   8%  |                                                                              |========                                                              |  12%  |                                                                              |===========                                                           |  16%  |                                                                              |==============                                                        |  20%  |                                                                              |=================                                                     |  24%  |                                                                              |====================                                                  |  28%  |                                                                              |======================                                                |  32%  |                                                                              |=========================                                             |  36%  |                                                                              |============================                                          |  40%  |                                                                              |===============================                                       |  44%  |                                                                              |==================================                                    |  48%  |                                                                              |====================================                                  |  52%  |                                                                              |=======================================                               |  56%  |                                                                              |======================================================================| 100%</span>
+<span class="r-in"><span><span class="va">tensobj</span>  <span class="co"># anomalous networks</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 20 30 23 32 13</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
