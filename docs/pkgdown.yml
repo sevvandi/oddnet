@@ -3,5 +3,8 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   oddnet: oddnet.html
-last_built: 2023-01-13T05:31Z
+last_built: 2023-01-13T06:55Z
+urls:
+  reference: https://sevvandi.github.io/oddnet/reference
+  article: https://sevvandi.github.io/oddnet/articles
 

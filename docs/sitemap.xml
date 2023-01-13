@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/oddnet.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/articles/oddnet.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/index.html</loc>
   </url>
   <url>
-    <loc>/reference/anomalous_networks.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/anomalous_networks.html</loc>
   </url>
   <url>
-    <loc>/reference/compute_features.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/compute_features.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/lad.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/lad.html</loc>
   </url>
   <url>
-    <loc>/reference/oddnet-package.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/oddnet-package.html</loc>
   </url>
   <url>
-    <loc>/reference/tensorsplat.html</loc>
+    <loc>https://sevvandi.github.io/oddnet/reference/tensorsplat.html</loc>
   </url>
 </urlset>
