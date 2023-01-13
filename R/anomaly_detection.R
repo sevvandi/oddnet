@@ -20,7 +20,6 @@
 #'  matrices for each network can be given using this feature.
 #' @param fast If set to \code{TRUE} will avoid computing time consuming features.
 #'
-#'
 #' @return Object imported from lookout.
 #' @seealso [lookout::lookout()]
 #'
