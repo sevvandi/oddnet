@@ -49,3 +49,5 @@ for(i in 1:100){
 anom <- anomalous_networks(networks)
 anom
 ```
+
+
