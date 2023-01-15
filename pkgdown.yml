@@ -1,0 +1,10 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  oddnet: oddnet.html
+last_built: 2023-01-15T22:13Z
+urls:
+  reference: https://sevvandi.github.io/oddnet/reference
+  article: https://sevvandi.github.io/oddnet/articles
+
