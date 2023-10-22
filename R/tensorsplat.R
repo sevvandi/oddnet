@@ -7,12 +7,12 @@
 #' @returns Anomalous observations
 #'
 #' @examples
-#' # We generate a series of networks and add an anomaly at 50th network.
+#' # We generate a series of networks and add an anomaly at 20th network.
 #' set.seed(1)
 #' networks <- list()
 #' p.or.m.seq <- rep(0.05, 50)
 #' p.or.m.seq[20] <- 0.2  # anomalous network at 20
-#' for(i in 1:100){
+#' for(i in 1:50){
 #'   gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
 #'   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 #' }
