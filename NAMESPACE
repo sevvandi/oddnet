@@ -3,7 +3,6 @@
 export(anomalous_networks)
 export(compute_features)
 export(lad)
-export(tensorsplat)
 importFrom(dplyr,'%>%')
 importFrom(rlang,.data)
 importFrom(stats,median)

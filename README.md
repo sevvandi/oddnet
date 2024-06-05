@@ -18,7 +18,7 @@ You can install the development version of oddnet from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("sevvandi/oddnet")
+# devtools::install_github("sevvandi/oddnet")
 ```
 
 ## Example

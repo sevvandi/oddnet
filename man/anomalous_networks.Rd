@@ -13,7 +13,8 @@ anomalous_networks(
   vert_attr = FALSE,
   attr_name = NULL,
   attr_mat = NULL,
-  fast = FALSE
+  fast = FALSE,
+  feature_subset = NULL
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ single attribute can be specified.}
 matrices for each network can be given using this feature.}
 
 \item{fast}{If set to \code{TRUE} will avoid computing time consuming features.}
+
+\item{feature_subset}{A feature computation parameter. A subset of features to be used for anomaly detection.}
 }
 \value{
 Object imported from lookout.

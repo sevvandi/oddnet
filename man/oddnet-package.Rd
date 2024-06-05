@@ -2,6 +2,7 @@
 % Please edit documentation in R/oddnet.R
 \docType{package}
 \name{oddnet-package}
+\alias{oddnet}
 \alias{oddnet-package}
 \title{oddnet: Anomaly Detection in Temporal Networks}
 \description{

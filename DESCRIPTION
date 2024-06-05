@@ -1,7 +1,7 @@
 Package: oddnet
 Type: Package
 Title: Anomaly Detection in Temporal Networks
-Version: 0.1.0
+Version: 0.1.1.2
 Authors@R: c(person("Sevvandi", "Kandanaarachchi", email = "sevvandik@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0337-0395")),
     person("Rob", "Hyndman", email = "rob.hyndman@monash.edu",
@@ -17,7 +17,7 @@ Description: Anomaly detection in dynamic, temporal networks. The package
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 Imports: 
     dplyr,
     fable,

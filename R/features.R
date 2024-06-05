@@ -18,7 +18,10 @@
 #'
 #' @importFrom stats median quantile sd
 #' @export compute_features
-compute_features <- function(gr, attributes = FALSE, attr_name = NULL, fast = FALSE){
+compute_features <- function(gr,
+                             attributes = FALSE,
+                             attr_name = NULL,
+                             fast = FALSE){
   # gr is an igraph object
   # triangles, degree and edges
   # compute_features_5

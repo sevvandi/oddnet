@@ -19,6 +19,7 @@
 #' @param attr_mat A feature computation parameter. If network nodes/vertices have attributes, the list of attribute
 #'  matrices for each network can be given using this feature.
 #' @param fast If set to \code{TRUE} will avoid computing time consuming features.
+#' @param feature_subset A feature computation parameter. A subset of features to be used for anomaly detection.
 #'
 #' @return Object imported from lookout.
 #' @seealso [lookout::lookout()]
@@ -48,7 +49,8 @@ anomalous_networks <- function(networks,
                                vert_attr = FALSE,
                                attr_name = NULL,
                                attr_mat = NULL,
-                               fast = FALSE){
+                               fast = FALSE,
+                               feature_subset = NULL){
 
 
   num_networks <- length(networks)
@@ -67,6 +69,11 @@ anomalous_networks <- function(networks,
     features[i, ] <- unlist(tt[1:num_feat])
   }
   colnames(features) <- names(tt)[1:num_feat]
+
+  # If feature subset is given take only those features
+  if(!is.null(feature_subset)){
+    features <- features[ ,feature_subset]
+  }
 
   if(!is.null(na_action)){
     features[is.na(features)] <- 0
