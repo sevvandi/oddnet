@@ -25,10 +25,10 @@ We create a sequence of temporal networks based on the Erdos Renyi construction 
 ```{r readdata}
 set.seed(1)
 networks <- list()
-p.or.m.seq <- seq(from = 0.01, to = 0.2, length.out = 100)
-p.or.m.seq[50] <- p.or.m.seq[50] + 0.2  # anomalous network
+p.seq <- seq(from = 0.01, to = 0.2, length.out = 100)
+p.seq[50] <- p.seq[50] + 0.2  # anomalous network
  for(i in 1:100){
-  gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+  gr <- igraph::sample_gnp(100, p = p.seq[i])
   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
 ```

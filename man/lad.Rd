@@ -33,10 +33,10 @@ and Reihaneh Rabbany from their KDD'20 paper Laplacian Change Point Detection fo
 # We generate a series of networks and add an anomaly at 50th network.
 set.seed(1)
 networks <- list()
-p.or.m.seq <- rep(0.05, 50)
-p.or.m.seq[20] <- 0.2  # anomalous network at 20
+p.seq <- rep(0.05, 50)
+p.seq[20] <- 0.2  # anomalous network at 20
 for(i in 1:50){
-  gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+  gr <- igraph::sample_gnp(100, p = p.seq[i])
   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
 ladobj <- lad(networks, k = 6, short_win = 2, long_win = 4)

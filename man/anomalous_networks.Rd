@@ -56,10 +56,10 @@ feature computation, scaling, robust PCA and anomaly detection procedures.   ADD
 # We generate a series of networks and add an anomaly at 50th network.
 set.seed(1)
 networks <- list()
-p.or.m.seq <- rep(0.1, 50)
-p.or.m.seq[20] <- 0.3  # anomalous network at 20
+p.seq <- rep(0.1, 50)
+p.seq[20] <- 0.3  # anomalous network at 20
 for(i in 1:50){
-  gr <- igraph::erdos.renyi.game(50, p.or.m = p.or.m.seq[i])
+  gr <- igraph::sample_gnp(50, p = p.seq[i])
   networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
 anomalous_networks(networks, fast = TRUE)

@@ -39,13 +39,16 @@ library(igraph)
 #>     union
 set.seed(1)
 networks <- list()
-p.or.m.seq <- rep(0.05, 100)
-p.or.m.seq[50] <- 0.2  # outlying network at 50
+p.seq <- rep(0.05, 100)
+p.seq[50] <- 0.2  # outlying network at 50
 for(i in 1:100){
- gr <- igraph::erdos.renyi.game(100, p.or.m = p.or.m.seq[i])
+ gr <- igraph::sample_gnp(100, p = p.seq[i])
  networks[[i]] <- igraph::as_adjacency_matrix(gr)
 }
 anom <- anomalous_networks(networks)
+#> Registered S3 method overwritten by 'tsibble':
+#>   method               from 
+#>   as_tibble.grouped_df dplyr
 anom
 #> Leave-out-out KDE outliers using lookout algorithm
 #> 
