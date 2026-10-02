@@ -14,7 +14,8 @@ anomalous_networks(
   attr_name = NULL,
   attr_mat = NULL,
   fast = FALSE,
-  feature_subset = NULL
+  feature_subset = NULL,
+  ...
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ matrices for each network can be given using this feature.}
 \item{fast}{If set to \code{TRUE} will avoid computing time consuming features.}
 
 \item{feature_subset}{A feature computation parameter. A subset of features to be used for anomaly detection.}
+
+\item{...}{Other arguments are passed to \code{igraph::graph_from_adjacency_matrix()}.}
 }
 \value{
 Object imported from lookout.

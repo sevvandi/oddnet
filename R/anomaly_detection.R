@@ -20,6 +20,7 @@
 #'  matrices for each network can be given using this feature.
 #' @param fast If set to \code{TRUE} will avoid computing time consuming features.
 #' @param feature_subset A feature computation parameter. A subset of features to be used for anomaly detection.
+#' @param ... Other arguments are passed to \code{igraph::graph_from_adjacency_matrix()}.
 #'
 #' @return Object imported from lookout.
 #' @seealso [lookout::lookout()]
@@ -50,7 +51,8 @@ anomalous_networks <- function(networks,
                                attr_name = NULL,
                                attr_mat = NULL,
                                fast = FALSE,
-                               feature_subset = NULL){
+                               feature_subset = NULL,
+                               ...){
 
 
   num_networks <- length(networks)
@@ -59,7 +61,7 @@ anomalous_networks <- function(networks,
 
   # Compute network features
   for(i in 1:num_networks){
-    gr <- igraph::graph_from_adjacency_matrix(networks[[i]])
+    gr <- igraph::graph_from_adjacency_matrix(networks[[i]],...)
     if(vert_attr){  # if the vertices have attributes
       gr <- igraph::set_vertex_attr(gr, attr_name, value = attr_mat[[i]])
       tt <- compute_features(gr, attributes = TRUE, attr_name = attr_name)
